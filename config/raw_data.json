@@ -1,0 +1,98 @@
+{
+"gln":{
+    "file":"gln_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"megan":{
+    "file":"megan_pred.txt",
+    "preprocess":true,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"space",
+    "colnames": ["target", "reactants", "info"]
+},
+"graphretro":{
+    "file":"graphretro_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"chemformer":{
+    "file":"chemformer_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"localretro":{
+    "file":"localretro_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"mhnreact":{
+    "file":"mhnreact_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"graph2smiles":{
+    "file":"graph2smiles_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"retroxpert":{
+    "file":"retroxpert_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"retroformer":{
+    "file":"retroformer_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"gta":{
+    "file":"gta_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"tiedtransformer":{
+    "file":"tiedtransformer_pred.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null
+},
+"g2retro":{
+    "file":"g2retro_pred.csv",
+    "preprocess":false,
+    "skip":true,
+    "class":"IndexSeparated",
+    "delimiter":"comma",
+    "colnames": null
+}
+}
