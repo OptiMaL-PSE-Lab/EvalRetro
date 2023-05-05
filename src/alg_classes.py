@@ -31,7 +31,7 @@ class Alg(ABC):
         self.check_smi = check_invalid_smi
         
         # Canonicalize all smiles within dataset
-        #self.canonicalize()
+        self.canonicalize()
 
         #Checking for invalid smiles 
         if os.path.exists(self.data_dir_cleaned):
@@ -58,7 +58,7 @@ class Alg(ABC):
             results = pd.DataFrame.from_dict(metric(self, args), orient='index')
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
         except FileNotFoundError as e:
-            os.mkdir(os.path.join(results_path, f'{self._name}'))
+            os.makedirs(os.path.join(results_path, f'{self._name}'))
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
         except TypeError:
             logger.exception(f"Something went wrong with {metric.name} evaluation for {self._name} dataset.")
@@ -84,7 +84,7 @@ class Alg(ABC):
         # Add logger info: 
         logger.info(f"Checking for invalid smiles in {self._name} dataset.\n Results are written to {self.file_inv_smiles} and {self.data_dir_cleaned}")
 
-        df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip, index_col=0)
+        df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip)
         all_reactants = self.list_reactants(False)
         invalid_smiles = []
         total_no_reactants = sum(len(item) if isinstance(item, list) else 0 for item in all_reactants)
@@ -100,17 +100,18 @@ class Alg(ABC):
         indeces = [index for _,index in invalid_smiles]
         df_alg_cleaned = df_alg.drop(indeces)
         df_alg_cleaned = df_alg_cleaned.iloc[:,-3:]
+        # reset indeces
+        df_alg.reset_index(drop=True, inplace=True)
         
         dict_inv_smiles = {"Index": [index for _,index in invalid_smiles], "Smile": [smi for smi,_ in invalid_smiles]}
         df_inv_smiles = pd.DataFrame(dict_inv_smiles)
 
         df_inv_smiles.to_csv(self.file_inv_smiles)
-        df_alg_cleaned.to_csv(self.data_dir_cleaned)
+        df_alg_cleaned.to_csv(self.data_dir_cleaned, index=False)
         smiles_inv_percentage = len(indeces) / total_no_reactants
         # Save percentage of invalid smiles in pickle file
         dir_results = os.path.join(results_path, f'{self._name}')
-        if not os.path.exists(dir_results):
-            os.mkdir(dir_results)
+        os.makedirs(dir_results, exist_ok=True)
         with open(os.path.join(dir_results, 'Inv_smi.pickle'), 'wb') as handle:
             pickle.dump(smiles_inv_percentage, handle)
 
@@ -191,16 +192,13 @@ class LineSeparated(Alg):
         rows = pd.isnull(df_alg).any(1)
         rows = rows.to_numpy().nonzero()[0]
         old_row = -1
-        rows = rows[:3]
 
         for row in tqdm(rows):
         # Ensuring that there is at least 1 prediction for each target
             if row-old_row != 2:
                 df_new = df_alg.iloc[old_row+1:row]
-                if metric_name == "rt":
-                    yield (df_new.iloc[0]["target"], df_new.iloc[1:]["reactants"].tolist())
 
-                elif metric_name == "scscore":
+                if metric_name == "scscore":
                     reactants = df_new.iloc[1:]["reactants"].str.split(".").tolist()
                     yield (df_new.iloc[0]["target"], reactants)
 
@@ -240,15 +238,12 @@ class IndexSeparated(Alg):
         rows = self.find_indeces(indeces)
         rows.append(df_alg.shape[0]+1)
         old_row = 0
-        rows = rows[:3]
         for row in tqdm(rows):
             # Ensuring that there is at least 1 prediction for each target
             if row-old_row != 1:
                 df_new = df_alg.iloc[old_row:row]
-                if metric_name == "rt":
-                    yield (df_new.iloc[0]["target"], df_new.iloc[1:]["reactants"].tolist())
 
-                elif metric_name == "scscore":
+                if metric_name == "scscore":
                     reactants = df_new.iloc[1:]["reactants"].str.split(".").tolist()
                     yield (df_new.iloc[0]["target"], reactants)
 

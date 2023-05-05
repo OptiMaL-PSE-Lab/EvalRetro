@@ -190,4 +190,3 @@ dependencies:
       - yarl==1.7.2
       - zc-lockfile==2.0
       - zipp==3.6.0
-prefix: /home/friedrich/anaconda3/envs/benm
