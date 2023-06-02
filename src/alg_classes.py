@@ -87,7 +87,7 @@ class Alg(ABC):
         df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip)
         all_reactants = self.list_reactants(False)
         invalid_smiles = []
-        total_no_reactants = sum(len(item) if isinstance(item, list) else 0 for item in all_reactants)
+        total_no_reactants = sum(1 if isinstance(item, list) else 0 for item in all_reactants)
         for idx, react_set in enumerate(tqdm(all_reactants)):
             if isinstance(react_set,list):
                 check_smiles = [catch(lambda: Chem.MolToSmiles(Chem.MolFromSmiles(smi), kekuleSmiles=True),smi, idx) for smi in react_set]
