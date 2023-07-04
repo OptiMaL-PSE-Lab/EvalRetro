@@ -1,14 +1,15 @@
 import logging
+import json
 import os
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from collections import defaultdict
 from IPython.display import display
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from ast import literal_eval
 
-from scipy.stats import gaussian_kde, norm
+from scipy.stats import gaussian_kde, norm, skewnorm
 from scipy.optimize import curve_fit
 
 # Create logger for error handling
@@ -20,25 +21,47 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+colors = [
+    (31/255, 119/255, 180/255),
+    (255/255, 127/255, 14/255),
+    (44/255, 160/255, 44/255),
+    (214/255, 39/255, 40/255),
+    (148/255, 103/255, 189/255),
+    (140/255, 86/255, 75/255),
+    (227/255, 119/255, 194/255),
+    (127/255, 127/255, 127/255),
+    (188/255, 189/255, 34/255),
+    (23/255, 190/255, 207/255),
+    (174/255, 199/255, 232/255),
+    (255/255, 187/255, 120/255)
+]
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
-results_dir = os.path.join(project_dir, 'results')
+results_dir = os.path.join(project_dir, 'results_hpc')
 fig_dir = os.path.join(project_dir, "figs")
+config_path = os.path.join(project_dir, "config")
 
-algorithms = [f for f in os.listdir(results_dir)]
+with open(os.path.join(config_path,"raw_data.json"), 'r') as f:
+    configs = json.load(f)
+
+alg_data = [(alg, configs[alg]["type"]) for alg in configs.keys()]
+# sort alg_data by type
+alg_data.sort(key=lambda x: x[1])
+algorithms = [alg[0] for alg in alg_data]
+
 
 def plot_layout(cnt):
     """
     Returns the layout for the plots
     """
-    if cnt % 2 == 0:
+    if cnt % 3 == 0:
+        nrows, ncols = 3, cnt // 3
+    elif cnt % 2 == 0:
         nrows, ncols = cnt // 2, 2
-    elif cnt % 3 == 0:
-        nrows, ncols = cnt // 3, 3
     else:
         nrows, ncols = cnt, 1
 
-    size = (5*ncols, 5*nrows)
+    size = (6*ncols, 6*nrows)
     fig, axs = plt.subplots(nrows, ncols, figsize=(size)) 
     axs = axs.reshape((nrows, ncols))  
 
@@ -55,6 +78,15 @@ def skewed_normal_pdf(x, mean, std, skewness):
     pdf_skewed_normal = 2 / std * pdf_standard_normal * norm.cdf(skewness * z)
 
     return pdf_skewed_normal
+
+def skewed_normal_cdf(x, mean, std_dev, skew):
+    # Create a skew-normal distribution object
+    skew_normal = skewnorm(skew, loc=mean, scale=std_dev)
+
+    # Calculate the CDF for the given value
+    cdf = skew_normal.cdf(x)
+
+    return cdf
 
 def plot_rt(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     """
@@ -94,18 +126,18 @@ def plot_rt(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         try:
             ax = axs[row_idx, col_idx]
             ax.bar(x=acc.bin, height=acc.acc_mean, edgecolor='black', align='edge', width=0.1)
-            ax.set_title(name)
-            ax.set_xlabel("Accuracy")
-            ax.set_ylabel("Frequency")
+            ax.set_title(name, fontsize=16)
+            ax.set_xlabel("Accuracy", fontsize=14)
+            ax.set_ylabel("Frequency", fontsize=14)
             # Add horizontal line to plot
             x = alg_acc_mean[f'{name}']
             # Add mean to legend
             ax.axvline(x=x, color='r', linestyle='dashed', linewidth=1)
+            ax.tick_params(axis='both', which='major', labelsize=12)
             ax.legend([f'Mean: {x:.2f}'])
             
         except Exception as e:
            pass
-    
     fig.suptitle("Round-trip Accuracy", fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'rt_acc.png'), dpi=300, bbox_inches='tight')
 
@@ -132,7 +164,8 @@ def plot_sc(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     
     # Plot results and save plot
     nrows, ncols, fig, axs = plot_layout(cnt)  
-
+    popts = []
+    names = []
     # Fit gaussain kde to each data point in retro_alg and plot
     for i, (name, sc) in enumerate(alg_sc.items()):
         row_idx, col_idx = divmod(i, ncols)
@@ -143,23 +176,64 @@ def plot_sc(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
             density = density/np.trapz(density, xs)
             ax = axs[row_idx, col_idx]
             ax.scatter(xs, density, s=8)
-            ax.set_title(name)
-            ax.set_xlabel("ScScore Difference")
-            ax.set_ylabel("Density")
+            ax.set_title(name, fontsize=16)
+            ax.set_xlabel("ScScore Difference", fontsize=14)
+            ax.set_ylabel("Density", fontsize=14)
+            ax.tick_params(axis='both', which='major', labelsize=12)
             # Add horizontal line to plot
             x = alg_sc_mean[f'{name}']
             # Add mean to legend
-            ax.axvline(x=x, color='r', linestyle='dashed', linewidth=1, label=f'Mean={x:.2f}')
             popt, _ = curve_fit(skewed_normal_pdf,xs,density, maxfev=5000)
+            popts.append(popt), names.append(name)
+            std, skew = popt[1], popt[2]
+            ax.axvline(x=x, color='r', linestyle='-', linewidth=1, label=f'Mean={x:.2f}')
+            # Add std to plot as line from mean with length of +/- std
+            ax.axvline(x=x+std, color='r', linestyle='dashed', linewidth=0.5, label=f'Std={std:.2f}')
+            ax.axvline(x=x-std, color='r', linestyle='dashed', linewidth=0.5)
             y_fit = skewed_normal_pdf(xs, *popt)
-            ax.plot(xs,y_fit,'k',label='Fit')
+            ax.plot(xs,y_fit,'k',label=f'Fit (Swd:{skew:.1f})')
             ax.set_xlim(-1.5,2)
-            ax.legend()
+
+            ax.legend(loc='upper left')
+
         except Exception as e:
             pass
     
     fig.suptitle("ScScore Difference",fontsize=16)
-    plt.savefig(os.path.join(fig_dir, 'scscore.png'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(fig_dir, 'scscore_pdf.png'), dpi=300, bbox_inches='tight')
+    
+    fig1, ax1 = plt.subplots()
+    ax1.set_ylabel('Probability', fontsize=10)
+    ax1.set_xlabel('SCScore Difference', fontsize=10)
+    fig1.set_size_inches([7,6])
+    left_1, bottom_1, left_2, bottom_2, width, heigth = [0.6, 0.5, 0.46, 0.18, 0.27, 0.27]
+    ax2 = fig1.add_axes([left_1, bottom_1, width, heigth])
+    ax3= fig1.add_axes([left_2, bottom_2, width, heigth])
+    ax1.set_prop_cycle(color=colors)
+    ax2.set_prop_cycle(color=colors)
+    ax3.set_prop_cycle(color=colors)
+    ax3.set_yscale('log')
+
+    for popt,name in zip(popts,names):
+        x = np.linspace(-1.5,2,200)
+        y = skewed_normal_cdf(x, *popt)
+        ax1.plot(x,y, label=name, linewidth=1.3)
+        ax2.plot(x,y, linewidth=0.8)
+        ax3.plot(x,y, linewidth=0.8)
+    ax1.set_xlim([-0.5, 2])
+    ax2.set_xlim([0.9,1.4])
+    ax2.set_ylim([0.85,1])
+    ax3.set_xlim([-0.4,0])
+    ax3.set_ylim([0.01,0.12])
+    ax2.set_yticks(np.arange(0.9, 1, 0.05))
+    ax2.tick_params(axis='both', which='both', labelsize=7)
+    ax3.tick_params(axis='both', which='both', labelsize=7)
+
+    ax1.legend(fontsize=9)
+    # draw box around inset
+    mark_inset(ax1, ax2, loc1=2, loc2=1, linestyle='--', linewidth=0.5)
+    mark_inset(ax1, ax3, loc1=2, loc2=3, linestyle='--', linewidth=0.5)
+    plt.savefig(os.path.join(fig_dir, 'scscore_cdf.png'), dpi=300, bbox_inches='tight')
 
     return alg_sc_mean
 
@@ -192,9 +266,9 @@ def plot_div(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         try: 
             ax = axs[row_idx, col_idx]
             div.plot.bar(ax = ax, edgecolor='black', align='center', width=1)
-            ax.set_title(name)
-            ax.set_xlabel("No. of Reaction Classes per Target")
-            ax.set_ylabel("Frequency")
+            ax.set_title(name, fontsize=16)
+            ax.set_xlabel("No. of Reaction Classes per Target", fontsize=14)
+            ax.set_ylabel("Frequency", fontsize=14)
             # Add horizontal line to plot
             x = alg_div_mean[f'{name}']
             # Modify the x-axis labels for 1-9 number of classes 
@@ -250,7 +324,7 @@ def plot_div_dist(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_di
             keys, value = zip(*div.items())
             ax = axs[row_idx, col_idx]
             ax.bar(keys, value, edgecolor='black', align='center', width=1)
-            ax.set_title(name)
+            ax.set_title(name, fontsize=16)
             ax.set_xlabel("Reaction Class")
             ax.set_ylabel("Frequency")
             # Turn x axis into log
@@ -292,9 +366,9 @@ def plot_dup(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         try:
             ax = axs[row_idx, col_idx]
             ax.bar(x=acc.bin, height=acc.dup, edgecolor='black', align='edge', width=0.1)
-            ax.set_title(name)
-            ax.set_xlabel("Duplicate Index")
-            ax.set_ylabel("Frequency")
+            ax.set_title(name, fontsize=16)
+            ax.set_xlabel("Duplicate Index",fontsize=14)
+            ax.set_ylabel("Frequency", fontsize=14)
             # Add horizontal line to plot
             x = alg_dup_mean[f'{name}']
             # Add mean to legend
@@ -352,6 +426,7 @@ def table_invalid_smi(algorithms=algorithms, results_dir=results_dir):
             inv_data = inv_data.T
             inv_data.columns = inv_data.iloc[0]
             values = inv_data.iloc[1:2, k].values
+            values *= 100
             alg_inv[f'{retro_alg}'] = pickle.load(open(os.path.join(results_dir, retro_alg, 'Inv_smi.pickle'), 'rb'))
         except Exception as e:
             print(e)
@@ -362,8 +437,9 @@ def table_invalid_smi(algorithms=algorithms, results_dir=results_dir):
     # Make dataframe from dictionaries
     df = pd.DataFrame(dict_inv)
     df = df.T
+    df = df.astype(float).round(2)
     df.columns = ['Top-1', 'Top-3', 'Top-5', 'Top-10', 'Top-20']
-    df["Total %"] = [np.round(alg_inv[f'{alg}'],2) for alg in algorithms]
+    df["Total %"] = [np.round(alg_inv[f'{alg}']*100,2) for alg in algorithms]
     print("\nInvalid Smiles Table:")
     display(df)
     df.to_csv(os.path.join(fig_dir, 'inv_smi_table.csv'))
@@ -377,7 +453,8 @@ def table_topk(algorithms=algorithms, results_dir=results_dir):
         k = ['Top_1','Top_3','Top_5','Top_10','Top_20']
         try:
             topk_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Top-k.csv"))
-            alg_topk[f'{retro_alg}'] = np.round(topk_data.iloc[0,1:].to_list(),2)
+            topk_data = topk_data.applymap(lambda x: x*100)
+            alg_topk[f'{retro_alg}'] = np.round(topk_data.iloc[0,1:].to_list(),1)
         except Exception as e:
             print(e)
             logger.error(f'{retro_alg} does not have InvSmiles.csv file or Inv_smi.pickle file')
@@ -411,8 +488,8 @@ def make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_dup_mea
 
 if __name__ == '__main__':
     # Plot results
-    alg_div_mean = plot_div()
     alg_cov, alg_acc_mean = plot_rt()
+    alg_div_mean = plot_div()
     alg_sc_mean = plot_sc()
     alg_dup_mean = plot_dup()
     # Make summary table
