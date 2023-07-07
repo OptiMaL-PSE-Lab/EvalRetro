@@ -18,12 +18,20 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class Alg(ABC):
-    def __init__(self, algname:str, check_invalid_smi:bool, skip_blank_lines:bool, remove_stereo:bool):
+    def __init__(self, algname:str, check_invalid_smi:bool, skip_blank_lines:bool, remove_stereo:bool, data_dir=None):
         self._name = algname
-
-        self.data_dir = os.path.join(data_path, f'{self._name}', f'{self._name}_processed.csv')
-        self.data_dir_cleaned = os.path.join(data_path, f'{self._name}', f'{self._name}_cleaned.csv')
-        self.file_inv_smiles = os.path.join(data_path, f'{self._name}', f'{self._name}_inv_smiles.csv')
+        if data_dir:
+            # More flexible data directory
+            self.data_dir = data_dir
+            parent_path = os.path.dirname(os.path.abspath(data_dir))
+            self.data_dir_cleaned = os.path.join(parent_path, f'{self._name}_cleaned.csv')
+            self.file_inv_smiles = os.path.join(parent_path, f'{self._name}_inv_smiles.csv')
+        
+        else:
+            self.data_dir = os.path.join(data_path, f'{self._name}', f'{self._name}_processed.csv')
+            self.data_dir_cleaned = os.path.join(data_path, f'{self._name}', f'{self._name}_cleaned.csv')
+            self.file_inv_smiles = os.path.join(data_path, f'{self._name}', f'{self._name}_inv_smiles.csv')
+            
         self.result_dir = os.path.join(results_path, f'{self._name}')
 
         self._skip = skip_blank_lines
