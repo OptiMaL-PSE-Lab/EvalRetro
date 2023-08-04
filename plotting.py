@@ -10,6 +10,7 @@ from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from ast import literal_eval
 
 from scipy.stats import gaussian_kde, norm, skewnorm
+from scipy.spatial.distance import jensenshannon
 from scipy.optimize import curve_fit
 
 # Create logger for error handling
@@ -44,7 +45,7 @@ config_path = os.path.join(project_dir, "config")
 with open(os.path.join(config_path,"raw_data.json"), 'r') as f:
     configs = json.load(f)
 
-alg_data = [(alg, configs[alg]["type"]) for alg in configs.keys()]
+alg_data = [(configs[alg]["name"], configs[alg]["type"]) for alg in configs.keys()]
 # sort alg_data by type
 alg_data.sort(key=lambda x: x[1])
 algorithms = [alg[0] for alg in alg_data]
@@ -62,7 +63,8 @@ def plot_layout(cnt):
         nrows, ncols = cnt, 1
 
     size = (6*ncols, 6*nrows)
-    fig, axs = plt.subplots(nrows, ncols, figsize=(size)) 
+    fig, axs = plt.subplots(nrows, ncols, figsize=(size))
+    fig.tight_layout(pad=5.0)
     axs = axs.reshape((nrows, ncols))  
 
     return nrows, ncols, fig, axs
@@ -99,7 +101,7 @@ def plot_rt(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     # Extract results from each algorithm
     for retro_alg in algorithms:
         try:
-            rt_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Round-trip.csv"))
+            rt_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Round-trip.csv"))
             rt_data = rt_data.iloc[:]
             rt_cov = rt_data.groupby('cov_total').size().div(len(rt_data))
             rt_cov = rt_cov.to_dict()
@@ -138,7 +140,6 @@ def plot_rt(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
             
         except Exception as e:
            pass
-    fig.suptitle("Round-trip Accuracy", fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'rt_acc.png'), dpi=300, bbox_inches='tight')
 
     return alg_cov, alg_acc_mean
@@ -154,7 +155,7 @@ def plot_sc(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
 
     for retro_alg in algorithms:
         try:
-            sc_data = pd.read_csv(os.path.join(results_dir, retro_alg, "SCScore.csv"))
+            sc_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "SCScore.csv"))
             alg_sc[f'{retro_alg}'] = sc_data['SCScore']
             alg_sc_mean[f'{retro_alg}'] = sc_data['SCScore'].mean()
             cnt +=1
@@ -199,7 +200,6 @@ def plot_sc(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         except Exception as e:
             pass
     
-    fig.suptitle("ScScore Difference",fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'scscore_pdf.png'), dpi=300, bbox_inches='tight')
     
     fig1, ax1 = plt.subplots()
@@ -247,7 +247,7 @@ def plot_div(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
 
     for retro_alg in algorithms:
         try:
-            div_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Diversity.csv"))
+            div_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Diversity.csv"))
             alg_div_mean[f'{retro_alg}'] = div_data['No_classes'].mean()
             bins = list(range(0, 9))
             div_data['bin'] = pd.cut(div_data['No_classes'], bins=bins, include_lowest=True)
@@ -279,7 +279,6 @@ def plot_div(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         except Exception as e:
             pass
     
-    fig.suptitle("Diversity of reaction prediction", fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'div.png'), dpi=300, bbox_inches='tight')
 
     return alg_div_mean
@@ -287,12 +286,14 @@ def plot_div(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
 def plot_div_dist(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     
     cnt = 0
-    alg_div_dist = {alg:{} for alg in algorithms}
-
+    alg_div_dist = {f"{i}":[] for i in range(1,11)}
+    alg_sim = {f"{alg}":0 for alg in algorithms}
+    
+    rxn_freq = [0.303,0.238,0.113,0.018,0.013,0.165,0.092,0.016,0.037,0.005]
     for retro_alg in algorithms:
         class_dist = {str(i):0 for i in range(1,11)}
         try:
-            div_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Diversity.csv"))
+            div_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Diversity.csv"))
             for row in div_data.iterrows():
                 classes = row[1]['Classes']
                 classes = literal_eval(classes)
@@ -307,32 +308,48 @@ def plot_div_dist(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_di
             total = sum(class_dist.values())
             # divide each value in class_dist by total to get frequency
             class_dist = {k: v/total for k, v in class_dist.items()}
-            alg_div_dist[f'{retro_alg}'] = class_dist
+            # put each value for key 
+            for key, value in class_dist.items():
+                alg_div_dist[f"{key}"].append(value)
+
+            # finally calculate the similarity between the two distributions 
+            # using the Jensen-Shannon divergence
+            freq = np.array(list(class_dist.values()))
+            freq_true = np.array(rxn_freq)
+            jsd = jensenshannon(freq, freq_true)
+            similarity = 1 - jsd
+            similarity = round(similarity, 2)
+            alg_sim[f"{retro_alg}"] = similarity
         except:
             logger.error(f'{retro_alg} does not have a Diversity.csv file')
             continue
     # Plot results and save plot
-    nrows, ncols = 2, 5 
+    nrows, ncols = 2, 5
     size = (5*ncols, 5*nrows)
-    fig, axs = plt.subplots(nrows, ncols, figsize=(size)) 
+    fig, axs = plt.subplots(nrows, ncols, figsize=(size))
+    fig.subplots_adjust(hspace=0.5, wspace=0.3)
     axs = axs.reshape((nrows, ncols)) 
-
-    # Group data by number of classes 
-    for i, (name, div) in enumerate(alg_div_dist.items()):
+    rxn_classes = ["Heteroatom Alkylation", "Acylation", "C-C Formation", "Heterocycle Formation", "Protections", "Deprotections", "Reductions", "Oxidations", "FG Interconversion", "FG Addition"]
+    
+    for i, (_, div) in enumerate(alg_div_dist.items()):
         row_idx, col_idx = divmod(i, ncols)
         try: 
-            keys, value = zip(*div.items())
             ax = axs[row_idx, col_idx]
-            ax.bar(keys, value, edgecolor='black', align='center', width=1)
-            ax.set_title(name, fontsize=16)
-            ax.set_xlabel("Reaction Class")
+            bars = ax.bar(algorithms, div, edgecolor='black', align='center', width=1)
+            ax.set_title(f"{rxn_classes[i]}", fontsize=14)
+            # rotate x axis labels
             ax.set_ylabel("Frequency")
-            # Turn x axis into log
+            new_bars = ax.bar("Ground-truth", rxn_freq[i], width=1, color='orange', edgecolor='black')
+            ax.axhline(y=rxn_freq[i], color='r', linestyle='dashed', linewidth=1)
+            new_list = algorithms + ["Ground-truth"]
+            ax.set_xticklabels(new_list, rotation=90)
+            [z.set_x(z.get_x() + 0.5) for z in new_bars]
+
         except Exception as e:
             print(e)
-    
-    fig.suptitle("Diversity distribution", fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'div_dist.png'), dpi=300, bbox_inches='tight')
+
+    return alg_sim
 
 def plot_dup(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     """ 
@@ -344,7 +361,7 @@ def plot_dup(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
     # Extract results from each algorithm
     for retro_alg in algorithms:
         try:
-            dup_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Duplicates.csv"))
+            dup_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Duplicates.csv"))
             alg_dup_mean[f'{retro_alg}'] = dup_data['dup'].mean()
             bins = np.linspace(0, 1, 11)
             dup_data['bin'] = pd.cut(dup_data['dup'], bins=bins, include_lowest=False)
@@ -378,7 +395,6 @@ def plot_dup(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
         except Exception as e:
            pass
 
-    fig.suptitle("Duplicate Reaction Index", fontsize=16)
     plt.savefig(os.path.join(fig_dir, 'dup.png'))
     return alg_dup_mean
 
@@ -389,7 +405,7 @@ def table_round_trip(algorithms=algorithms, results_dir=results_dir):
     list_rt = []
     for retro_alg in algorithms:
         try:
-            rt_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Round-trip.csv"))
+            rt_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Round-trip.csv"))
             # compute mean for each column
             rt_data_mean = rt_data.mean(axis=0)
             # round values to 3 decimal places
@@ -422,12 +438,12 @@ def table_invalid_smi(algorithms=algorithms, results_dir=results_dir):
     for retro_alg in algorithms:
         k = np.array([1,3,5,10,20])-1
         try:
-            inv_data = pd.read_csv(os.path.join(results_dir, retro_alg, "InvSmiles.csv"), names=['Top-k', 'value'], header=0, index_col=False)
+            inv_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "InvSmiles.csv"), names=['Top-k', 'value'], header=0, index_col=False)
             inv_data = inv_data.T
             inv_data.columns = inv_data.iloc[0]
             values = inv_data.iloc[1:2, k].values
             values *= 100
-            alg_inv[f'{retro_alg}'] = pickle.load(open(os.path.join(results_dir, retro_alg, 'Inv_smi.pickle'), 'rb'))
+            alg_inv[f'{retro_alg}'] = pickle.load(open(os.path.join(results_dir, retro_alg.lower(), 'Inv_smi.pickle'), 'rb'))
         except Exception as e:
             print(e)
             logger.error(f'{retro_alg} does not have InvSmiles.csv file or Inv_smi.pickle file')
@@ -452,7 +468,7 @@ def table_topk(algorithms=algorithms, results_dir=results_dir):
     for retro_alg in algorithms:
         k = ['Top_1','Top_3','Top_5','Top_10','Top_20']
         try:
-            topk_data = pd.read_csv(os.path.join(results_dir, retro_alg, "Top-k.csv"))
+            topk_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Top-k.csv"))
             topk_data = topk_data.applymap(lambda x: x*100)
             alg_topk[f'{retro_alg}'] = np.round(topk_data.iloc[0,1:].to_list(),1)
         except Exception as e:
@@ -468,16 +484,16 @@ def table_topk(algorithms=algorithms, results_dir=results_dir):
 
 # Make summary table
 
-def make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_dup_mean, fig_dir=fig_dir):
+def make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_jenson, alg_dup_mean, fig_dir=fig_dir):
     """ 
     Make summary table of results 
     """
     # Make dataframe from dictionaries
-    df = pd.DataFrame([alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_dup_mean])
+    df = pd.DataFrame([alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_jenson, alg_dup_mean])
     # Transpose dataframe
     df = df.T
     # Rename columns
-    df.columns = ['Rt Accuracy', 'Rt Cov', 'ScScore', 'Diversity', 'Duplicate Index']
+    df.columns = ['Rt Accuracy', 'Rt Cov', 'ScScore', 'Diversity', 'Jenson-Shannon', 'Duplicate Index']
     # Round values
     df = df.round(2)
     # Save table
@@ -492,8 +508,9 @@ if __name__ == '__main__':
     alg_div_mean = plot_div()
     alg_sc_mean = plot_sc()
     alg_dup_mean = plot_dup()
+    alg_sim = plot_div_dist()
     # Make summary table
     table_topk()
     table_invalid_smi()
     table_round_trip()
-    df = make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_dup_mean)
+    df = make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_sim, alg_dup_mean)
