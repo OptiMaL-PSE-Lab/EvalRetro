@@ -13,6 +13,10 @@ conda env create -n evalretro -f environment.yml
 ## File Structure: 
 To test the predictions, the file must follow one of the two following structures:
 
+1. **Line-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
+2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indicies (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
+
+The configuration for a specific algorithm is defined in 
 
 ## Testing Algorithm: 
 Put the file containing into the ./data directory 
