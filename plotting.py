@@ -38,7 +38,7 @@ colors = [
 ]
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
-results_dir = os.path.join(project_dir, 'results_hpc')
+results_dir = os.path.join(project_dir, 'results')
 fig_dir = os.path.join(project_dir, "figs")
 config_path = os.path.join(project_dir, "config")
 
