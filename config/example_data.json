@@ -1,8 +1,8 @@
 {
 "key":{
     "file":"file_name.csv",      
-    "preprocess":bool,            
-    "skip":bool,                  
+    "preprocess":false,            
+    "skip":false,                  
     "class":"LineSeparated",      
     "delimiter":"comma",         
     "colnames": null,            

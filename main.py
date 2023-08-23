@@ -18,12 +18,13 @@ parser.add_argument('--invsmiles', type=int, help='Number of predictions check f
 parser.add_argument('--dup', type=int, help='Number of predictions check for duplicates', default=20)
 parser.add_argument('--stereo', type=bool, help='Whether to remove stereochemistry for fwd model', default=True)
 parser.add_argument('--check', type=bool, help='Remove invalid smiles from files', default=True)
+parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
 
 args = parser.parse_args()
 # Calling env variable
 data_path = os.environ['DATAPATH']
 config_path = os.environ['CONFIGPATH']
-with open(os.path.join(config_path,"raw_data.json"), 'r') as f:
+with open(os.path.join(config_path, args.config_name), 'r') as f:
     config = json.load(f)
 
 # Create dict for fwd models
