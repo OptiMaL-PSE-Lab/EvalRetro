@@ -169,10 +169,15 @@ if __name__ == "__main__":
 
     from src.utils.data_preprocess import megan_preprocess
     import json 
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(description='Preprocess data for retrosynthesis algorithms')
+    parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
+    args = parser.parse_args()
 
     pre_funcs = {"megan": megan_preprocess}
 
-    with open(os.path.join(config_path, "raw_data.json")) as f:
+    with open(os.path.join(config_path, args.config_name)) as f:
         configs = json.load(f)
     for name in configs.keys():
         alg_data = configs[name]
