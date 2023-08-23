@@ -1,0 +1,17 @@
+model: GCN
+  layers: 3
+  hidden_dim: 200
+  node_feat: 7
+
+model: EGAT
+  layers: 4
+  hidden_dim: 200
+  node_feat: 7
+  edge_dim: 3
+
+model: DMPNN
+  layers: 5
+  hidden_dim: 256
+  graph_feat: 200
+  node_feat: 7
+  edge_dim: 3
