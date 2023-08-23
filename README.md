@@ -1,11 +1,11 @@
 # evalretro
-A repository for evaluation single step retrosynthesis algorithms.
+A repository for evaluating single-step retrosynthesis algorithms.
 
 The datafiles related to all benchmarked algorithms can be found below:
 https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
 
 ## Environment
-Set up a new environment by running the following command: 
+Set up a new environment by running the following line in your terminal: 
 
 ``` 
 conda env create -n evalretro -f environment.yml 
@@ -14,7 +14,7 @@ conda env create -n evalretro -f environment.yml
 To test the predictions, the file must follow one of the two following structures:
 
 1. **Line-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
-2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indicies (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
+2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
 
 The data file should contain the following columns: ["index", "target", "reactants"]
 
@@ -36,7 +36,7 @@ The structure is in json format and structured as follows:
 To test your own algorithm, replace the example in [the example config directory](./config/new_config.json) with your own configuration data.
 
 ## Pre-processing Data
-Put the file containing into the ./data directory.
+Put the file containing your predictions into the ./data directory.
 To ensure that the file has the correct structure and information in the config file, run the following line of code: 
 ```
 conda activate evalretro
@@ -65,4 +65,34 @@ To reproduce results in paper, follow the steps below:
 4. Run `python plotting.py` to generate figures and tables
 
 # Interpretability Study
+The code related to the interpretability study is found in [the interpretability folder](./interpret).
+
+## Environment
+The environment can be set-up running the following lines of code: 
+
+```
+conda create -n rxn_exp python=3.10
+conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
+conda install pyg -c pyg
+conda install scikit-learn -c conda-forge
+conda install tqdm
+pip install rdkit
+```
+
+## Data Files
+Install both folders from the following link and place them into the ./interpret directory:
+https://www.dropbox.com/sh/h5jnlmc4caebe3u/AADwIUVvKPg52oeGQWAMjogUa?dl=0
+
+## Reproducibility
+Pre-trained models are provided in the dropbox. However, models can be retrained by running: 
+```
+conda activate rxn_exp
+cd interpret
+python train.py --model_type DMPNN
+```
+The model_type can be chosen from: DMPNN, EGAT and GCN.
+
+To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the paper, run `python inference.py`.
+
+![Example of interpretability case study](/interpret/example_interpret.png)
 
