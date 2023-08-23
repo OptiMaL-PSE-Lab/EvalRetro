@@ -1,0 +1,12 @@
+{
+"key":{
+    "file":"file_name.csv",      
+    "preprocess":bool,            
+    "skip":bool,                  
+    "class":"LineSeparated",      
+    "delimiter":"comma",         
+    "colnames": null,            
+    "type": "tmplate",            
+    "name": "your_name"                        
+}
+}
