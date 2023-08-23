@@ -10,3 +10,10 @@ Set up a new environment by running the following command:
 ``` 
 conda env create -n evalretro -f environment.yml 
 ```
+## File Structure: 
+To test the predictions, the file must follow one of the two following structures:
+
+
+## Testing Algorithm: 
+Put the file containing into the ./data directory 
+
