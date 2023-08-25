@@ -8,7 +8,7 @@ https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
 Set up a new environment by running the following line in your terminal: 
 
 ``` 
-conda env create -n evalretro -f environment.yml 
+conda create -n evalretro -f environment.yml 
 ```
 ## File Structure
 To test the predictions, the file must follow one of the two following structures:
