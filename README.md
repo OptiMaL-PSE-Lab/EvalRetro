@@ -75,7 +75,7 @@ conda create -n rxn_exp python=3.10
 conda install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
 conda install pyg -c pyg
 conda install scikit-learn -c conda-forge
-conda install tqdm
+conda install tqdm matplotlib pandas
 pip install rdkit
 ```
 
