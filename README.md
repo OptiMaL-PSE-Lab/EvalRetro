@@ -1,5 +1,5 @@
-[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 # evalretro
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 A repository for evaluating single-step retrosynthesis algorithms.
 
 The datafiles related to all benchmarked algorithms can be found below:
