@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 import torch
 from torch_geometric.explain import Explainer
-from torch_geometric.explain.algorithm import GNNExplainer, PGExplainer
+from torch_geometric.explain.algorithm import GNNExplainer
 from torch_geometric.explain.metric import fidelity
 from pathlib import Path
 from tqdm import tqdm
@@ -179,6 +179,11 @@ def explain_model_gt(rxn, name, model_type, saved_model, target):
 
 def visualise_explanation(explanation, rxn, name, bond, split=False, custom_weights=None, correction=None):
     folder = name.split('_')[0]
+    folder_path = Path(__file__).parent / 'figs' / f'{folder}'
+    if folder_path.is_dir():
+        pass
+    else:
+        folder_path.mkdir(parents=True, exist_ok=True)
     
     if split:
         rxn = rxn.split('>>')[1]
