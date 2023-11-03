@@ -25,10 +25,10 @@ The structure is in json format and structured as follows:
 ```
 {
 "key":{
-    "file":"file_name.csv",       # In ./data/key directory
+    "file":"file_name.csv",       # In ./data/"key" directory
     "preprocess":bool,            # Keep this as false if data file has the correct structure
-    "skip":bool,                  # false if LineSeparated, true if IndexSeparated
     "class":"LineSeparated",      # One of: ["LineSeparated", "IndexSeparated"]
+    "skip":bool,                  # false if LineSeparated, true if IndexSeparated
     "delimiter":"comma",          # Delimiter of file. One of: ["comma", " "]
     "colnames": null,             # null unless data file has different header to ["idx", "target", "reactants"]
     "type": "tmplate",            # Retrosynthesis category, One of: ["tmplate", "semi", "tfree"]
