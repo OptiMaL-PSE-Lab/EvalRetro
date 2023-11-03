@@ -93,15 +93,14 @@ class Alg(ABC):
         logger.info(f"Checking for invalid smiles in {self._name} dataset.\n Results are written to {self.file_inv_smiles} and {self.data_dir_cleaned}")
 
         df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip)
-        all_reactants = self.list_reactants(False)
+        all_reactants = df_alg["reactants"].tolist()
         invalid_smiles = []
-        total_no_reactants = sum(1 if isinstance(item, list) else 0 for item in all_reactants)
+        total_no_reactants = sum(1 if isinstance(item, str) else 0 for item in all_reactants)
         for idx, react_set in enumerate(tqdm(all_reactants)):
-            if isinstance(react_set,list):
-                check_smiles = [catch(lambda: Chem.MolToSmiles(Chem.MolFromSmiles(smi), kekuleSmiles=True),smi, idx) for smi in react_set]
-                invalid_smi = list(filter(lambda x: x != (1,None), check_smiles))
-                if invalid_smi != []:
-                    invalid_smiles += invalid_smi
+            if isinstance(react_set,str):
+                check_smiles = catch(lambda: Chem.MolToSmiles(Chem.MolFromSmiles(react_set), kekuleSmiles=True),react_set, idx)
+                if check_smiles != (1,None):
+                    invalid_smiles.append(check_smiles)
             else:
                 continue    
 
@@ -164,23 +163,12 @@ class Alg(ABC):
         mol_target = Chem.MolFromSmiles(target_smile)
         Chem.RemoveStereochemistry(mol_target)
         target_smile = Chem.MolToSmiles(mol_target, kekuleSmiles=True)
-        for index, react in enumerate(reactants): 
+        for index, react in enumerate(reactants):
             mol_rct = Chem.MolFromSmiles(react)
             Chem.RemoveStereochemistry(mol_rct)
             reactants[index] = Chem.MolToSmiles(mol_rct, kekuleSmiles=True)
         
         return target_smile, reactants
-
-    def list_reactants(self, boolean:bool) -> list:
-        """ 
-        Create a list of reactants such that for a target: -> [[set_1],[set_2],...,[set_n]] 
-        for n no. of predictions
-        """    
-        if boolean:
-            df_alg = pd.read_csv(self.data_dir_cleaned, skip_blank_lines=self._skip)
-        else:
-            df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip)
-        return df_alg["reactants"].str.split(".").tolist()
 
 class LineSeparated(Alg):
     """ 
@@ -190,7 +178,7 @@ class LineSeparated(Alg):
         super().__init__(algname, check_invalid_smi, skip_lines, check_stereo)
     
     def get_data(self, metric_name:str):
-        uncleaned_metrics = ['invsmi', 'rt', 'topk']
+        uncleaned_metrics = ['invsmi', 'topk']
 
         if self.check_smi and metric_name not in uncleaned_metrics:
             df_alg = pd.read_csv(self.data_dir_cleaned, skip_blank_lines=self._skip, index_col=0)
@@ -207,7 +195,7 @@ class LineSeparated(Alg):
                 df_new = df_alg.iloc[old_row+1:row]
 
                 if metric_name == "scscore":
-                    reactants = df_new.iloc[1:]["reactants"].str.split(".").tolist()
+                    reactants = df_new.iloc[0:]["reactants"].str.split(".").tolist()
                     yield (df_new.iloc[0]["target"], reactants)
 
                 elif metric_name in ['dup','rt']:
@@ -235,7 +223,7 @@ class IndexSeparated(Alg):
         super().__init__(algname, check_invalid_smi, skip_lines, check_stereo)
 
     def get_data(self, metric_name:str):
-        uncleaned_metrics = ['invsmi', 'rt', 'topk']
+        uncleaned_metrics = ['invsmi', 'topk']
 
         if self.check_smi and metric_name not in uncleaned_metrics:
             df_alg = pd.read_csv(self.data_dir_cleaned, skip_blank_lines=self._skip, index_col=0)
@@ -252,7 +240,7 @@ class IndexSeparated(Alg):
                 df_new = df_alg.iloc[old_row:row]
 
                 if metric_name == "scscore":
-                    reactants = df_new.iloc[1:]["reactants"].str.split(".").tolist()
+                    reactants = df_new.iloc[0:]["reactants"].str.split(".").tolist()
                     yield (df_new.iloc[0]["target"], reactants)
 
                 elif metric_name in ['dup','rt']:

@@ -56,15 +56,15 @@ def test_models(model_type, saved_model, rxn_test, k=5):
 
     if model_type == 'GCN':
         model = GCN(7, 100, n_layers=3)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
         model.eval()
     elif model_type == 'EGAT':
         model = EGAT(7, 3, 200, n_layers=4)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
         model.eval()
     elif model_type == 'DMPNN':
         model = DMPNN(7, 3, 256, 200, n_layers=5)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
         model.eval()
     else:
         raise ValueError("Model type not supported")
@@ -96,13 +96,13 @@ def explain_model(rxn, name, model_type, saved_model):
     
     if model_type == 'GCN':
         model = GCN(7, 100, n_layers=3)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
     elif model_type == 'EGAT':
         model = EGAT(7, 3, 200, n_layers=4) 
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
     elif model_type == 'DMPNN':
         model = DMPNN(7, 3, 256, 200, n_layers=5)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
     else:
         raise ValueError("Model type not supported")
     
@@ -144,20 +144,20 @@ def explain_model_gt(rxn, name, model_type, saved_model, target):
     
     if model_type == 'GCN':
         model = GCN(7, 100, n_layers=3)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model,map_location=device))
     elif model_type == 'EGAT':
         model = EGAT(7, 3, 200, n_layers=4) 
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
     elif model_type == 'DMPNN':
         model = DMPNN(7, 3, 256, 200, n_layers=5)
-        model.load_state_dict(torch.load(saved_model))
+        model.load_state_dict(torch.load(saved_model, map_location=device))
     else:
         raise ValueError("Model type not supported")
 
     model.eval()
     explainer = Explainer(
         model=model,
-        algorithm=GNNExplainer(epochs=1200, lr=0.0125), 
+        algorithm=GNNExplainer(epochs=500, lr=0.0125), 
         explanation_type='phenomenon',
         node_mask_type='object',
         model_config=dict(

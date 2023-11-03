@@ -19,17 +19,19 @@ def calculate_diff_scscore(scores:dict):
     """ 
      Used to calculate difference in target/reactants sc_score and average along k predicted reactants
     """
-    sc_differences = {"SCScore": float}
+    sc_differences = {"SCScore": float, "SCScore_gt": float}
     max_sc = []
+    gt_rct = np.array(scores["reactants"][1])
     for i in scores["reactants"]:
         rct = np.array(scores["reactants"][i])
-        if np.sum(rct)>0:
+        if np.sum(rct)>0 and i != 1:
             rct = np.max(rct)
             max_sc.append(rct)
     with warnings.catch_warnings():
         warnings.filterwarnings("error")
         avg = np.average(np.array(max_sc))
         sc_differences["SCScore"] = scores["target"] - avg
+        sc_differences["SCScore_gt"] = scores["target"] - np.max(gt_rct)
 
     return sc_differences
 
@@ -105,9 +107,6 @@ def adjust_smiles(reactant_smiles, metric_name):
         try:
             Chem.MolToSmiles(Chem.MolFromSmiles(rxn))
         except:
-            if metric_name == 'rt':
-                reactant_smiles[i] = 'c1ccccc1O'
-            else:
                 reactant_smiles.pop(i)
     return reactant_smiles
 

@@ -48,7 +48,7 @@ num_chars = terminal_width - 1  # subtract 1 to account for newline character
 
 eval_metrics = [round_trip, eval_scscore, diversity, duplicates, invsmiles, top_k]
 # List foldernames under Data directory 
-algorithms = [f for f in os.listdir(data_path)]
+algorithms = [f for f in os.listdir(data_path) if f != ".gitkeep"]
 alg_type = {"LineSeparated": LineSeparated, "IndexSeparated": IndexSeparated}
 
 def constructor():

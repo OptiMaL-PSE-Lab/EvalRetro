@@ -42,15 +42,17 @@ def eval_scscore(alg:object, args):
     
     diff_scores = defaultdict()
     # Getting one prediction from test set at a time
-    for k ,(smiles_tar, smiles_rxn) in enumerate(alg.get_data("scscore")):  # Maybe get id_rxn if needed
-        # Check if uncleaned dataset is used
-        if not cleaned_data:
-            smiles_rxn = adjust_smiles(smiles_rxn[:k_pred_retro], 'sc')
+    for k ,(smiles_tar, smiles_rxn) in enumerate(alg.get_data("scscore")):
+        
         # Getting ScScore for target in question
         scores = defaultdict(dict)
         _, scores["target"] = model.get_score_from_smi(smiles_tar) 
+
+        # Check if uncleaned dataset is used
+        if not cleaned_data:
+            smiles_rxn = adjust_smiles(smiles_rxn[:k_pred_retro+1], 'sc')
         # Getting ScScores for all predicted reaction sets
-        for i, smi_list in enumerate(smiles_rxn[:k_pred_retro]):
+        for i, smi_list in enumerate(smiles_rxn[:k_pred_retro+1]):
             scores_rxn = []
             for smi in smi_list: 
                 try:
@@ -61,7 +63,7 @@ def eval_scscore(alg:object, args):
                     print("Exception")
                     scores_rxn.append(0)
             
-            scores["reactants"][str(i+1)] = scores_rxn
+            scores["reactants"][i+1] = scores_rxn
         
         diff_scores[f"{k}_{smiles_tar}"] = calculate_diff_scscore(scores) # Maybe add id_rxn to dictionary
 
@@ -78,11 +80,13 @@ def round_trip(alg, args):
 
     round_trip.name = "Round-trip"
     rt_scores = defaultdict(dict)
+    cleaned_data = alg.check_smi
 
     for k, (smiles_tar, reactants) in enumerate(alg.get_data("rt")):
         
         # Uncleaned data always used
-        reactants = adjust_smiles(reactants[:k_pred_retro], 'rt')
+        if not cleaned_data:
+            reactants = adjust_smiles(reactants[:k_pred_retro], 'trial')
         if alg.remove_stereo:
             smiles_tar, reactants = alg.stereo(smiles_tar, reactants)
         target = smiles_tar
@@ -144,10 +148,10 @@ def duplicates(alg, args):
         # Get length of keys and rxn
         n_keys = len(counter.keys())
         n_rxn = len(reactants)
-        if n_keys == 1:
+        if n_keys == n_rxn:
             dup[f'{i}_{smiles_tar}'] = {'dup': 1}
         else:
-            dup[f'{i}_{smiles_tar}']= {'dup': 1 - (n_keys/n_rxn)}
+            dup[f'{i}_{smiles_tar}']= {'dup': (n_keys-1)/n_rxn}
 
     return dup
 
@@ -274,7 +278,7 @@ def duplicates_single(target_smile, reactant_smiles):
     # Get length of keys and rxn
     n_keys = len(counter.keys())
     n_rxn = len(reactant_smiles)
-    if n_keys == 1:
+    if n_keys == n_rxn:
         return 1
     else:
-        return (1 - (n_keys/n_rxn), n_keys)
+        return ((n_keys-1/n_rxn), n_keys)
