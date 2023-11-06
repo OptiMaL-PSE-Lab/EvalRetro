@@ -7,6 +7,7 @@ from torch_geometric.explain.algorithm import GNNExplainer
 from torch_geometric.explain.metric import fidelity
 from pathlib import Path
 from tqdm import tqdm
+from matplotlib import pyplot as plt
 from matplotlib import colormaps as cm
 from matplotlib.colors import LinearSegmentedColormap
 
@@ -89,6 +90,14 @@ def explain_model(rxn, name, model_type, saved_model):
     y_bonds = y_atoms = np.zeros(10)
     data = smiles_to_pyg(rxn, y_bonds, y_atoms, is_product=True)
     data = data.to(device)
+    if name == 'DMPNN_Test_1':
+        hp = 8
+        lr = 0.135
+    elif name == 'EGAT_Test_2':
+        hp = 6
+    else: 
+        hp = 5
+        lr = 0.14
     
     # get number of atom sin smile
     mol = Chem.MolFromSmiles(rxn)
@@ -109,7 +118,7 @@ def explain_model(rxn, name, model_type, saved_model):
     model.eval()
     explainer = Explainer(
         model=model,
-        algorithm=GNNExplainer(epochs=1600, lr=0.014), 
+        algorithm=GNNExplainer(epochs=1600, lr=lr), 
         explanation_type='model',
         node_mask_type='object',
         model_config=dict(
@@ -120,7 +129,7 @@ def explain_model(rxn, name, model_type, saved_model):
         ),
         threshold_config=dict(
             threshold_type="topk",
-            value=5,
+            value=hp,
          )
     )
     explanation = explainer(data.x, data.edge_index, edge_attr=data.edge_attr, info_batch=data.batch, return_type="Explain",train=False)
@@ -157,7 +166,7 @@ def explain_model_gt(rxn, name, model_type, saved_model, target):
     model.eval()
     explainer = Explainer(
         model=model,
-        algorithm=GNNExplainer(epochs=1200, lr=0.0125), 
+        algorithm=GNNExplainer(epochs=1200, lr=0.013), 
         explanation_type='phenomenon',
         node_mask_type='object',
         model_config=dict(
@@ -209,6 +218,7 @@ def visualise_explanation(explanation, rxn, name, bond, split=False, custom_weig
 
     mol = Chem.MolFromSmiles(rxn)
     AllChem.ComputeGasteigerCharges(mol)
+    plt.close(fig)
 
     # Assign your custom weights to the atoms
     for i, weight in enumerate(weights):
@@ -233,10 +243,10 @@ if __name__ == '__main__':
     rxn_test = df_test['rxn'].tolist()
     model_type = 'EGAT'
     saved_model = f'models/{model_type}_model.pt'
-    # test_models(model_type, saved_model, rxn_test)
+    test_models(model_type, saved_model, rxn_test)
     model_type = 'DMPNN'
     saved_model = f'models/{model_type}_model.pt'
-    # test_models(model_type, saved_model, rxn_test)
+    test_models(model_type, saved_model, rxn_test)
 
     for i, (name, smi, tar) in df_exp_graph.iterrows():
         model_type = name.split('_')[0]
@@ -245,9 +255,9 @@ if __name__ == '__main__':
         explain_model(rxn_single, name, model_type, saved_model)
         explain_model_gt(rxn_single, name, model_type, saved_model, tar)  
 
-    # for i, (name, smi, weight) in df_exp_tf.iterrows():
-    #     rxn_single = smi
-    #     weight = weight.split(',')
-    #     weight = [float(w) for w in weight]
-    #     visualise_explanation(None, rxn_single, name, custom_weights=weight, bond=None)
+    for i, (name, smi, weight) in df_exp_tf.iterrows():
+        rxn_single = smi
+        weight = weight.split(',')
+        weight = [float(w) for w in weight]
+        visualise_explanation(None, rxn_single, name, custom_weights=weight, bond=None)
     
