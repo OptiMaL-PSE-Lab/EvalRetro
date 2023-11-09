@@ -58,6 +58,7 @@ Within the script, the following hyperparameters can be adjusted:
 - k_forward: Forward model includes _k_ target predictions per reactant set.
 - fwd_model: Type of forward reaction prediction model. So far, only _gcn_ is included.
 - config_name: Name of the config file to be used
+- quick_eval: Boolean - prints the results (averages) for evaluation metrics directly to the terminal.
 
 ## Reproducibility
 To reproduce results in paper, follow the steps below: 
