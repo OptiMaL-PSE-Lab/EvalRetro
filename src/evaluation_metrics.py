@@ -30,6 +30,8 @@ def eval_scscore(alg:object, args):
 
     k_pred_retro, model_version = args.k_back, args.scmodel
     eval_scscore.name = "SCScore"
+    eval_scscore.index = "SCScore"
+    eval_scscore.k = args.k_back
     cleaned_data = alg.check_smi
 
     model_list = {"2048bool":"full_reaxys_model_2048bool", "1024int":"full_reaxys_model_1024uint8", "1024bool":"full_reaxys_1024bool"}
@@ -79,6 +81,8 @@ def round_trip(alg, args):
     k_pred_retro, k_pred_forw, fwd_model = args.k_back, args.k_forward, args.fwd_model
 
     round_trip.name = "Round-trip"
+    round_trip.index = "acc_mean"
+    round_trip.k = args.k_back
     rt_scores = defaultdict(dict)
     cleaned_data = alg.check_smi
 
@@ -106,6 +110,8 @@ def diversity(alg, args):
     Calculation of class diversity as proposed by Schwaller
     """
     diversity.name = "Diversity"
+    diversity.index = "No_classes"
+    diversity.k = args.k_back
     cleaned_data = alg.check_smi
     
     k_pred_retro = args.k_back
@@ -137,6 +143,8 @@ def duplicates(alg, args):
     This metric is normalized from 0-1 where 0 is no duplicates
     """
     duplicates.name = "Duplicates"
+    duplicates.index = "dup"
+    duplicates.k = args.k_back
 
     dup = defaultdict(dict)
 
@@ -159,6 +167,8 @@ def duplicates(alg, args):
 def invsmiles(alg, args):
 
     invsmiles.name = "InvSmiles"
+    invsmiles.index = "top_k"
+    invsmiles.k = args.invsmiles
 
     k_pred_retro = args.invsmiles
     top_k_invalid = []
@@ -193,6 +203,8 @@ def top_k(alg, args):
      Calculation of classic top-k accuracy for sanity checks
     """
     top_k.name = "Top-k"
+    top_k.index = "top_k"
+    top_k.k = args.k_back
 
     k_dict = {'1': 0, '3': 0, '5': 0, '10': 0, '20':0}
     keys = k_dict.keys()

@@ -4,6 +4,7 @@ import shutil
 import os
 import argparse 
 import json
+import numpy as np
 
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, invsmiles, top_k
@@ -19,6 +20,7 @@ parser.add_argument('--dup', type=int, help='Number of predictions check for dup
 parser.add_argument('--stereo', type=bool, help='Whether to remove stereochemistry for fwd model', default=True)
 parser.add_argument('--check', type=bool, help='Remove invalid smiles from files', default=True)
 parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
+parser.add_argument('--quick_eval', type=bool, help='Whether to evaluate results on the fly', default=True)
 
 args = parser.parse_args()
 # Calling env variable
@@ -46,7 +48,7 @@ logging.getLogger().addHandler(stream_handler)
 terminal_width = shutil.get_terminal_size().columns
 num_chars = terminal_width - 1  # subtract 1 to account for newline character
 
-eval_metrics = [round_trip, eval_scscore, diversity, duplicates, invsmiles, top_k]
+eval_metrics = [diversity, duplicates, invsmiles, top_k, eval_scscore, round_trip]
 # List foldernames under Data directory 
 algorithms = [f for f in os.listdir(data_path) if f != ".gitkeep"]
 alg_type = {"LineSeparated": LineSeparated, "IndexSeparated": IndexSeparated}
@@ -54,6 +56,7 @@ alg_type = {"LineSeparated": LineSeparated, "IndexSeparated": IndexSeparated}
 def constructor():
     
     for retro_alg in algorithms:
+        summary_stats = []
         # Log algorithm name about to evaluate and directory for results
         print('-'*num_chars)
         logging.info(f"Evaluating {retro_alg}:\n Results will be saved in {os.path.join(os.getcwd(), 'results', retro_alg)}")
@@ -68,7 +71,16 @@ def constructor():
         for metric in eval_metrics:
             # Log metric name about to evaluate
             logging.info(f"Evaluating {metric.__name__}")
-            alg_instance.evaluate(metric, args)
+            print_results = alg_instance.evaluate(metric, args)
+            summary_stats.append(print_results)
+
+        # Print results to terminal:
+        if args.quick_eval:
+            print('-'*num_chars)
+            print(f"Results for {retro_alg}:")
+            for i,metric in enumerate(eval_metrics):
+                print(f"Top-{metric.k} {metric.__name__}: {np.round(summary_stats[i], 2)}\n")
+            print('-'*num_chars)
 
 if __name__ == "__main__":
     constructor()

@@ -57,20 +57,24 @@ class Alg(ABC):
         Yielding predictions for targets to be used for eval metrics, this depends on datafile for alg
         """
         pass
-      
+
     def evaluate(self, metric, args): 
         """ 
         Evaluating algorithm on particular metric
         """
         try:
             results = pd.DataFrame.from_dict(metric(self, args), orient='index')
+            print_results = self._quick_eval(results, metric.index)
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
-        except FileNotFoundError as e:
+            return print_results
+        except FileNotFoundError:
+            results = pd.DataFrame.from_dict(metric(self, args), orient='index')
             os.makedirs(os.path.join(results_path, f'{self._name}'))
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
+            return print_results
         except TypeError:
             logger.exception(f"Something went wrong with {metric.name} evaluation for {self._name} dataset.")
-    
+            return None    
 
     def detect_inv_smiles(self):
         """
@@ -169,6 +173,16 @@ class Alg(ABC):
             reactants[index] = Chem.MolToSmiles(mol_rct, kekuleSmiles=True)
         
         return target_smile, reactants
+    
+    def _quick_eval(self, results:pd.DataFrame, index_name:str) -> float:
+        """
+        Allows for the presentation of results in quick fashion
+        """
+        if index_name == 'top_k':
+            print_results = results.iat[-1,-1]
+        else:
+            print_results = results[index_name].mean()    
+        return print_results
 
 class LineSeparated(Alg):
     """ 
