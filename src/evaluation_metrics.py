@@ -156,11 +156,10 @@ def duplicates(alg, args):
         # Get length of keys and rxn
         n_keys = len(counter.keys())
         n_rxn = len(reactants)
-        if n_keys == n_rxn:
-            dup[f'{i}_{smiles_tar}'] = {'dup': 1}
-        else:
-            dup[f'{i}_{smiles_tar}']= {'dup': (n_keys-1)/n_rxn}
-
+        try:
+            dup[f'{i}_{smiles_tar}']= {'dup': (n_keys-1)/(n_rxn-1)}
+        except ZeroDivisionError:
+            dup[f'{i}_{smiles_tar}']= {'dup': 0}
     return dup
 
 
@@ -290,7 +289,4 @@ def duplicates_single(target_smile, reactant_smiles):
     # Get length of keys and rxn
     n_keys = len(counter.keys())
     n_rxn = len(reactant_smiles)
-    if n_keys == n_rxn:
-        return 1
-    else:
-        return ((n_keys-1/n_rxn), n_keys)
+    return ((n_keys-1)/(1-n_rxn), n_keys)
