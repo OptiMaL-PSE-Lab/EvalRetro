@@ -1,8 +1,10 @@
 # evalretro
-[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![Python 3.10](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A repository for evaluating single-step retrosynthesis algorithms.
+
+This branch corresponds to the Python 3.10 implementation of *evalretro*. The environment.yml file was updated to reflect changes in dependencies. This code was tested for **Linux** exclusively - it is suggested to use WSL2 (Ubuntu) for Windows OS.
 
 The datafiles related to all benchmarked algorithms can be found below:
 https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
@@ -11,7 +13,8 @@ https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
 Set up a new environment by running the following line in your terminal: 
 
 ``` 
-conda create -n evalretro -f environment.yml 
+conda create -n evalretro -f environment.yml
+pip install rxnfp --no-deps
 ```
 ## File Structure
 To test the predictions, the file must follow one of the two following structures:
