@@ -1,4 +1,4 @@
-name: benm
+name: evalretro
 channels:
   - defaults
 dependencies:
