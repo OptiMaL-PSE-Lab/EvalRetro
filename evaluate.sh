@@ -1,6 +1,6 @@
 #!bin/bash
 
-conda activate benm
+conda activate evalretro
 export DATAPATH=./data
 export CONFIGPATH=./config
 

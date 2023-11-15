@@ -6,6 +6,9 @@ import argparse
 import json
 import numpy as np
 
+# Disable tensorflow warning if no GPU found
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, invsmiles, top_k
 from src.utils.fwd_mdls import gcn_forward 
@@ -32,9 +35,6 @@ with open(os.path.join(config_path, args.config_name), 'r') as f:
 # Create dict for fwd models
 fwd_models = {"gcn": gcn_forward}
 args.fwd_model = fwd_models[args.fwd_model]
-
-# Disable tensorflow warning if no GPU found
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 logging.basicConfig(filename='logs/main.log',level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
