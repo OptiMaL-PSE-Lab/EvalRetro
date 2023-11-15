@@ -45,16 +45,16 @@ class DirectCandRanker():
 
         self.graph = tf.Graph()
         with self.graph.as_default():
-            input_atom = tf.placeholder(tf.float32, [None, None, adim])
-            input_bond = tf.placeholder(tf.float32, [None, None, bdim])
-            atom_graph = tf.placeholder(tf.int32, [None, None, max_nb, 2])
-            bond_graph = tf.placeholder(tf.int32, [None, None, max_nb, 2])
-            num_nbs = tf.placeholder(tf.int32, [None, None])
-            core_bias = tf.placeholder(tf.float32, [None])
+            input_atom = tf.compat.v1.placeholder(tf.float32, [None, None, adim])
+            input_bond = tf.compat.v1.placeholder(tf.float32, [None, None, bdim])
+            atom_graph = tf.compat.v1.placeholder(tf.int32, [None, None, max_nb, 2])
+            bond_graph = tf.compat.v1.placeholder(tf.int32, [None, None, max_nb, 2])
+            num_nbs = tf.compat.v1.placeholder(tf.int32, [None, None])
+            core_bias = tf.compat.v1.placeholder(tf.float32, [None])
             self.src_holder = [input_atom, input_bond, atom_graph, bond_graph, num_nbs, core_bias]
 
             graph_inputs = (input_atom, input_bond, atom_graph, bond_graph, num_nbs) 
-            with tf.variable_scope("mol_encoder"):
+            with tf.compat.v1.variable_scope("mol_encoder"):
                 fp_all_atoms = rcnn_wl_only(graph_inputs, hidden_size=hidden_size, depth=depth)
 
             reactant = fp_all_atoms[0:1,:]
@@ -62,7 +62,7 @@ class DirectCandRanker():
             candidates = candidates - reactant
             candidates = tf.concat([reactant, candidates], 0)
 
-            with tf.variable_scope("diff_encoder"):
+            with tf.compat.v1.variable_scope("diff_encoder"):
                 reaction_fp = wl_diff_net(graph_inputs, candidates, hidden_size=hidden_size, depth=1)
 
             reaction_fp = reaction_fp[1:]
@@ -75,8 +75,8 @@ class DirectCandRanker():
             _, pred_topk = tf.nn.top_k(score, tk)
             self.predict_vars = [score, scaled_score, pred_topk]
 
-            self.session = tf.Session()
-            saver = tf.train.Saver()
+            self.session = tf.compat.v1.Session()
+            saver = tf.compat.v1.train.Saver()
             saver.restore(self.session, model_path)
     
     def predict(self, react, top_cand_bonds, top_cand_scores=[], scores=True, top_n=100):

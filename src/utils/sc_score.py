@@ -54,7 +54,7 @@ class SCScorer():
                 if mol is None:
                     return np.zeros((self.FP_len,), dtype=np.float32)
                 return np.array(AllChem.GetMorganFingerprintAsBitVect(mol, self.FP_rad, nBits=self.FP_len,
-                    useChirality=True), dtype=np.bool)
+                    useChirality=True), dtype=bool)
         self.mol_to_fp = mol_to_fp
 
         self._restored = True
