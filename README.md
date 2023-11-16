@@ -13,7 +13,7 @@ https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
 Set up a new environment by running the following line in your terminal: 
 
 ``` 
-conda create -n evalretro -f environment.yml
+conda env create -n evalretro --file environment.yml 
 pip install rxnfp --no-deps
 ```
 ## File Structure
