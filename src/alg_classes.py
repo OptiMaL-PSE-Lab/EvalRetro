@@ -199,7 +199,7 @@ class LineSeparated(Alg):
         else:
             df_alg = pd.read_csv(self.data_dir, skip_blank_lines=self._skip,index_col=0)
         
-        rows = pd.isnull(df_alg).any(1)
+        rows = pd.isnull(df_alg).any(axis=1)
         rows = rows.to_numpy().nonzero()[0]
         old_row = -1
 

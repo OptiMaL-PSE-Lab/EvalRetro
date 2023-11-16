@@ -36,20 +36,20 @@ class DirectCoreFinder():
 
         self.graph = tf.Graph()
         with self.graph.as_default():
-            input_atom = tf.placeholder(tf.float32, [batch_size, None, adim])
-            input_bond = tf.placeholder(tf.float32, [batch_size, None, bdim])
-            atom_graph = tf.placeholder(tf.int32, [batch_size, None, max_nb, 2])
-            bond_graph = tf.placeholder(tf.int32, [batch_size, None, max_nb, 2])
-            num_nbs = tf.placeholder(tf.int32, [batch_size, None])
-            node_mask = tf.placeholder(tf.float32, [batch_size, None])
+            input_atom = tf.compat.v1.placeholder(tf.float32, [batch_size, None, adim])
+            input_bond = tf.compat.v1.placeholder(tf.float32, [batch_size, None, bdim])
+            atom_graph = tf.compat.v1.placeholder(tf.int32, [batch_size, None, max_nb, 2])
+            bond_graph = tf.compat.v1.placeholder(tf.int32, [batch_size, None, max_nb, 2])
+            num_nbs = tf.compat.v1.placeholder(tf.int32, [batch_size, None])
+            node_mask = tf.compat.v1.placeholder(tf.float32, [batch_size, None])
             self.src_holder = [input_atom, input_bond, atom_graph, bond_graph, num_nbs, node_mask]
-            self.label = tf.placeholder(tf.int32, [batch_size, None])
-            self.binary = tf.placeholder(tf.float32, [batch_size, None, None, binary_fdim])        
+            self.label = tf.compat.v1.placeholder(tf.int32, [batch_size, None])
+            self.binary = tf.compat.v1.placeholder(tf.float32, [batch_size, None, None, binary_fdim])        
 
             node_mask = tf.expand_dims(node_mask, -1)
 
             graph_inputs = (input_atom, input_bond, atom_graph, bond_graph, num_nbs, node_mask)
-            with tf.variable_scope("encoder"):
+            with tf.compat.v1.variable_scope("encoder"):
                 atom_hiddens, _ = rcnn_wl_last(graph_inputs, batch_size=batch_size, hidden_size=hidden_size, depth=depth)
 
             atom_hiddens1 = tf.reshape(atom_hiddens, [batch_size, 1, -1, hidden_size])
@@ -72,7 +72,7 @@ class DirectCoreFinder():
 
             score = linearND(pair_hidden, 5, scope="scores")
             score = tf.reshape(score, [batch_size, -1])
-            bmask = tf.to_float(tf.equal(self.label, INVALID_BOND)) * 10000
+            bmask = tf.compat.v1.to_float(tf.equal(self.label, INVALID_BOND)) * 10000
             topk_scores, topk = tf.nn.top_k(score - bmask, k=NK3)
             label_dim = tf.shape(self.label)[1]
             
@@ -80,8 +80,8 @@ class DirectCoreFinder():
             self.predict_vars = [topk, topk_scores, label_dim, att_score]
             
             # Restore
-            self.session = tf.Session()
-            saver = tf.train.Saver()
+            self.session = tf.compat.v1.Session()
+            saver = tf.compat.v1.train.Saver()
             saver.restore(self.session, model_path)
         
     def predict(self, reactants_smi):
