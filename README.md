@@ -1,4 +1,4 @@
-# evalretro
+ # evalretro
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -11,7 +11,7 @@ https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
 Set up a new environment by running the following line in your terminal: 
 
 ``` 
-conda create -n evalretro -f environment.yml 
+conda env create -n evalretro --file environment.yml 
 ```
 ## File Structure
 To test the predictions, the file must follow one of the two following structures:
