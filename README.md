@@ -4,10 +4,7 @@
 
 A repository for evaluating single-step retrosynthesis algorithms.
 
-This branch corresponds to the Python 3.10 implementation of *evalretro*. The environment.yml file was updated to reflect changes in dependencies. This code was tested for **Linux** exclusively - it is suggested to use WSL2 (Ubuntu) for Windows OS.
-
-The datafiles related to all benchmarked algorithms can be found below:
-https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
+This code was tested for Linux (Ubuntu), Windows and Mac OS.
 
 ## Environment
 Set up a new environment by running the following line in your terminal: 
@@ -16,13 +13,52 @@ Set up a new environment by running the following line in your terminal:
 conda env create -n evalretro --file environment.yml 
 pip install rxnfp --no-deps
 ```
-## File Structure
-To test the predictions, the file must follow one of the two following structures:
+For MacOS, replace the environment.yml file with:
+``` 
+conda env create -n evalretro --file environment_mac.yml 
+```
+
+## Reproducibility
+To reproduce results in paper, follow the steps below: 
+1. Download all data files from dropbox and place inside ./data directory <br />
+    > The datafiles related to all benchmarked algorithms can be found below:
+    > https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0 
+2. Run the following lines of code within your terminal:
+   ```
+   conda activate evalretro
+   python data_import.py --config_name raw_data.json
+   python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'raw_data.json' --quick_eval False
+   ```
+3. Run `python plotting.py` to generate figures and tables
+
+## Testing your own algorithm
+
+Put the file containing your predictions into the ./data/"key" (see [Config File Structure](#File-Structure)) directory.
+To ensure that the file has the correct structure, run the following line of code: 
+```
+conda activate evalretro
+python data_import.py --config_name new_config.json 
+```
+If no error is logged, the algorithm can be tested with: 
+```
+python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'new_config.json' --quick_eval False  
+```
+
+Within the script, the following hyperparameters can be adjusted: 
+- k_back: Evaluation includes _k_ retrosynthesis predictions per target
+- k_forward: Forward model includes _k_ target predictions per reactant set.
+- fwd_model: Type of forward reaction prediction model. So far, only _gcn_ is included.
+- config_name: Name of the config file to be used
+- quick_eval: Boolean - prints the results (averages) for evaluation metrics directly to the terminal.
+- data_path: The path to the folder that contains your file, default = ./data
+
+### File Structure
+The file should follow one of the following two formats:
 
 1. **Line-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
 2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
 
-The data file should contain the following columns: ["index", "target", "reactants"]
+The data headers should contain the following columns: ["index", "target", "reactants"]
 
 The configuration for the benchmarked algorithm is shown in [the config directory](./config/raw_data.json). Specifying the configuration is important so that the data file is processed correctly. 
 The structure is in json format and structured as follows: 
@@ -40,36 +76,6 @@ The structure is in json format and structured as follows:
 },
 ```
 To test your own algorithm, replace the example in [the example config directory](./config/new_config.json) with your own configuration data.
-
-## Pre-processing Data
-Put the file containing your predictions into the ./data directory.
-To ensure that the file has the correct structure and information in the config file, run the following line of code: 
-```
-conda activate evalretro
-python data_import.py --config_name new_config.json
-```
-If no error is logged, the algorithm can be tested.
-
-## Testing Algorithm
-To test your own algorithms, run:
-```
-source evaluate.sh  
-```
-Note: Adjust --config_name to 'new_config.json' 
-
-Within the script, the following hyperparameters can be adjusted: 
-- k_back: Evaluation includes _k_ retrosynthesis predictions per target
-- k_forward: Forward model includes _k_ target predictions per reactant set.
-- fwd_model: Type of forward reaction prediction model. So far, only _gcn_ is included.
-- config_name: Name of the config file to be used
-- quick_eval: Boolean - prints the results (averages) for evaluation metrics directly to the terminal.
-
-## Reproducibility
-To reproduce results in paper, follow the steps below: 
-1. Download all data files from dropbox and place inside ./data directory
-2. Run the code in for data pre-processing with --config_name raw_data.json
-3. Run `source evaluate.sh`
-4. Run `python plotting.py` to generate figures and tables
 
 # Interpretability Study
 The code related to the interpretability study is found in [the interpretability folder](./interpret).
@@ -99,7 +105,9 @@ python train.py --model_type DMPNN
 ```
 The model_type can be chosen from: DMPNN, EGAT and GCN.
 
-To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the paper, run `python inference.py`.
+To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the paper, run:  
+```
+python inference.py
+```
 
 ![Example of interpretability case study](/interpret/example_interpret.png)
-
