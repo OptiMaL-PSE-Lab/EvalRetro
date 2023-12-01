@@ -16,10 +16,6 @@ c_handler.setFormatter(c_format)
 logger.addHandler(c_handler)
 
 project_root = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(project_root,'data')
-config_path = os.path.join(project_root,'config')
-
-#! Fix automated indexing and test for files 
 
 class LoadData(ABC):
     def __init__(self, file_name, delimiter, alg_name, preprocess) -> None:
@@ -101,14 +97,14 @@ class TextCsvData(LoadData):
         """
         try:
             if self.colnames:
-                df_txt = pd.read_csv(os.path.join(data_path, self._alg_name, self._file_name),
+                df_txt = pd.read_csv(os.path.join(args.data_path, self._alg_name, self._file_name),
                 delimiter=self._delimiter,
                 names = self.colnames,
                 skip_blank_lines = self.skiplines,
                 index_col=0
             )
             else:
-                df_txt = pd.read_csv(os.path.join(data_path, self._alg_name, self._file_name),
+                df_txt = pd.read_csv(os.path.join(args.data_path, self._alg_name, self._file_name),
                 delimiter=self._delimiter,
                 skip_blank_lines=self.skiplines,
                 index_col=0
@@ -159,7 +155,7 @@ class TextCsvData(LoadData):
 
     def save_data(self):
         try:
-            self.df_ext.to_csv(os.path.join(data_path, self._alg_name, self._alg_name + "_processed.csv"))
+            self.df_ext.to_csv(os.path.join(args.data_path, self._alg_name, self._alg_name + "_processed.csv"))
             print(f'{self._alg_name} data saved to data/{self._alg_name} directory.')
         except:
             logger.warning(f"For {self.file_name}:\n Processed data unable to save.")
@@ -173,11 +169,13 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description='Preprocess data for retrosynthesis algorithms')
     parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
+    parser.add_argument('--data_path',  type=str, help='Location of data files', default='data')
+    parser.add_argument('--config_path',  type=str, help='Location of config files', default='config')
     args = parser.parse_args()
 
     pre_funcs = {"megan": megan_preprocess}
 
-    with open(os.path.join(config_path, args.config_name)) as f:
+    with open(os.path.join(args.config_path, args.config_name)) as f:
         configs = json.load(f)
     for name in configs.keys():
         alg_data = configs[name]

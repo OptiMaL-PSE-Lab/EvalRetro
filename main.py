@@ -5,9 +5,12 @@ import os
 import argparse 
 import json
 import numpy as np
+import warnings
 
 # Disable tensorflow warning if no GPU found
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+# Ignore warning for pickled logistic regression
+warnings.filterwarnings("ignore", category=UserWarning)
 
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, invsmiles, top_k
@@ -24,12 +27,13 @@ parser.add_argument('--stereo', type=bool, help='Whether to remove stereochemist
 parser.add_argument('--check', type=bool, help='Remove invalid smiles from files', default=True)
 parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
 parser.add_argument('--quick_eval', type=bool, help='Whether to evaluate results on the fly', default=True)
+parser.add_argument('--data_path',  type=str, help='Location of data files', default='data')
+parser.add_argument('--config_path',  type=str, help='Location of config files', default='config')
 
 args = parser.parse_args()
 # Calling env variable
-data_path = os.environ['DATAPATH']
-config_path = os.environ['CONFIGPATH']
-with open(os.path.join(config_path, args.config_name), 'r') as f:
+cwd = os.getcwd()
+with open(os.path.join(cwd, args.config_path, args.config_name), 'r') as f:
     config = json.load(f)
 
 # Create dict for fwd models
@@ -50,7 +54,7 @@ num_chars = terminal_width - 1  # subtract 1 to account for newline character
 
 eval_metrics = [diversity, duplicates, invsmiles, top_k, eval_scscore, round_trip]
 # List foldernames under Data directory 
-algorithms = [f for f in os.listdir(data_path) if f != ".gitkeep"]
+algorithms = [f for f in os.listdir(os.path.join(cwd,args.data_path)) if f != ".gitkeep"]
 alg_type = {"LineSeparated": LineSeparated, "IndexSeparated": IndexSeparated}
 
 def constructor():
