@@ -217,7 +217,7 @@ class LineSeparated(Alg):
 
                 elif metric_name in ['topk', 'invsmi']:
                     gt = df_new.iloc[0]["reactants"]
-                    reactants = df_new.iloc[1:]["reactants"]
+                    reactants = df_new.iloc[1:]["reactants"].tolist()
                     yield gt, reactants
 
                 elif metric_name == 'div':
@@ -263,7 +263,7 @@ class IndexSeparated(Alg):
                 elif metric_name in ['topk', 'invsmi']:
                     
                     gt = df_new.iloc[0]["reactants"]
-                    reactants = df_new.iloc[1:]["reactants"]
+                    reactants = df_new.iloc[1:]["reactants"].tolist()
                     yield gt, reactants
 
                 elif metric_name == 'div':
