@@ -33,7 +33,7 @@ To reproduce results in paper, follow the steps below:
 
 ## Testing your own algorithm
 
-Put the file containing your predictions into the ./data/"key" (see [Config File Structure](#File-Structure)) directory.
+Put the file containing your predictions into the ./data/"key" directory (see [Config File Structure](#File-Structure) for the correct layout of the .csv containing your predictions per molecular target).
 To ensure that the file has the correct structure, run the following line of code: 
 ```
 conda activate evalretro
@@ -58,9 +58,9 @@ The file should follow one of the following two formats:
 1. **Line-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
 2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
 
-The data headers should contain the following columns: ["index", "target", "reactants"]
+The headers within the file should contain the following columns: ["index", "target", "reactants"]
 
-The configuration for the benchmarked algorithm is shown in [the config directory](./config/raw_data.json). Specifying the configuration is important so that the data file is processed correctly. 
+The configuration for the benchmarked algorithm is shown in [the config directory](./config/raw_data.json). Specifying the configuration is important so that the data file is processed correctly by the code. 
 The structure is in json format and structured as follows: 
 ```
 {
