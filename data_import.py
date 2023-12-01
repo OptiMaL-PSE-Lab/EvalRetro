@@ -99,10 +99,11 @@ class TextCsvData(LoadData):
             if self.colnames:
                 df_txt = pd.read_csv(os.path.join(args.data_path, self._alg_name, self._file_name),
                 delimiter=self._delimiter,
-                names = self.colnames,
+                usecols = range(len(self.colnames)+1),
                 skip_blank_lines = self.skiplines,
                 index_col=0
             )
+                df_txt.columns = self.colnames
             else:
                 df_txt = pd.read_csv(os.path.join(args.data_path, self._alg_name, self._file_name),
                 delimiter=self._delimiter,

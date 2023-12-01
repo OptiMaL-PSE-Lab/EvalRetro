@@ -11,7 +11,7 @@ from tqdm import tqdm
 def megan_preprocess(obj):
     df_old = obj.df_txt
 
-    rows = pd.isnull(df_old).any(1)
+    rows = pd.isnull(df_old).any(axis=1)
     rows = rows.to_numpy().nonzero()[0]
     old_row = -1
     
