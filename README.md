@@ -32,6 +32,7 @@ To reproduce results in paper, follow the steps below:
 3. Run `python plotting.py` to generate figures and tables
 
 ## Testing your own algorithm
+Please follow the instructions provided herein and/or look at the example Jupyter notebook provided in [the examples directory](./examples/evaluate_algorithm.ipynb)
 
 Put the file containing your predictions into the ./data/"key" directory (see [Config File Structure](#File-Structure) for the correct layout of the .csv containing your predictions per molecular target).
 To ensure that the file has the correct structure, run the following line of code: 
@@ -43,7 +44,6 @@ If no error is logged, the algorithm can be tested with:
 ```
 python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'new_config.json' --quick_eval False  
 ```
-
 Within the script, the following hyperparameters can be adjusted: 
 - k_back: Evaluation includes _k_ retrosynthesis predictions per target
 - k_forward: Forward model includes _k_ target predictions per reactant set.
@@ -61,7 +61,7 @@ The file should follow one of the following two formats:
 The headers within the file should contain the following columns: ["index", "target", "reactants"]
 
 The configuration for the benchmarked algorithm is shown in [the config directory](./config/raw_data.json). Specifying the configuration is important so that the data file is processed correctly by the code. 
-The structure is in json format and structured as follows: 
+The structure is in .json format and structured as follows: 
 ```
 "key":{
     "file":"file_name.csv",       # In ./data/"key" directory
@@ -73,7 +73,7 @@ The structure is in json format and structured as follows:
     "type": "tmplate",            # Retrosynthesis category, One of: ["tmplate", "semi", "tfree"]
     "name": "your_name"           # Name of the algorithm
 }
-
+```
 To test your own algorithm, replace the example in [the example config directory](./config/new_config.json) with your own configuration data.
 
 # Interpretability Study
@@ -109,5 +109,4 @@ To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the 
 conda activate rxn_exp
 python inference.py
 ```
-
 ![Example of interpretability case study](/examples/example_interpret.png)
