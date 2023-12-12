@@ -6,11 +6,8 @@ import argparse
 import json
 import numpy as np
 import warnings
-
 # Disable tensorflow warning if no GPU found
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-# Ignore warning for pickled logistic regression
-warnings.filterwarnings("ignore", category=UserWarning)
 
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, invsmiles, top_k
@@ -19,7 +16,6 @@ from src.utils.fwd_mdls import gcn_forward
 parser = argparse.ArgumentParser(description='Evaluate retrosynthesis algorithms')
 parser.add_argument('--k_back', type=int, help='Number of predictions made per target for retrosynthesis', default=10)
 parser.add_argument('--k_forward', type=int, help='Number of predictions made per reactant set for forward synthesis', default=2)
-parser.add_argument('--scmodel', type=str, help='Name of scscore model to use', default="2048bool")
 parser.add_argument('--fwd_model', type=str, help='Name of forward model to use', default='gcn')
 parser.add_argument('--invsmiles', type=int, help='Number of predictions check for invalid smiles per target', default=20)
 parser.add_argument('--dup', type=int, help='Number of predictions check for duplicates', default=20)
@@ -71,7 +67,7 @@ def constructor():
             logging.error(f"Specify {retro_alg} in config file")
         alg = alg_type[info["class"]]
 
-        alg_instance = alg(retro_alg, args.check, info["skip"], args.stereo)
+        alg_instance = alg(retro_alg, args.check, info["skip"], args.stereo, args.data_path)
         for metric in eval_metrics:
             # Log metric name about to evaluate
             logging.info(f"Evaluating {metric.__name__}")

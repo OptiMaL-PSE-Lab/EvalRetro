@@ -157,7 +157,7 @@ class TextCsvData(LoadData):
     def save_data(self):
         try:
             self.df_ext.to_csv(os.path.join(args.data_path, self._alg_name, self._alg_name + "_processed.csv"))
-            print(f'{self._alg_name} data saved to data/{self._alg_name} directory.')
+            print(f'{self._alg_name} data saved to {args.data_path}/{self._alg_name} directory.')
         except:
             logger.warning(f"For {self.file_name}:\n Processed data unable to save.")
 

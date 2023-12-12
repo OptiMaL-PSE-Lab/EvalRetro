@@ -28,19 +28,14 @@ def eval_scscore(alg:object, args):
      Calculation of ScScore proposed by Coley
      """
 
-    k_pred_retro, model_version = args.k_back, args.scmodel
+    k_pred_retro = args.k_back
     eval_scscore.name = "SCScore"
     eval_scscore.index = "SCScore"
     eval_scscore.k = args.k_back
     cleaned_data = alg.check_smi
 
-    model_list = {"2048bool":"full_reaxys_model_2048bool", "1024int":"full_reaxys_model_1024uint8", "1024bool":"full_reaxys_1024bool"}
     model = SCScorer()
-
-    if model_list[model_version] == "full_reaxys_model_2048bool":
-        model.restore(os.path.join(project_root, 'src', 'sc_models', model_list[model_version], 'model.ckpt-10654.as_numpy.json.gz'), FP_len=2048)
-    else: 
-        model.restore(os.path.join(project_root, 'src', 'sc_models', model_list[model_version], 'model.ckpt-10654.as_numpy.json.gz'))
+    model.restore(os.path.join(project_root, 'src', 'sc_models', 'full_reaxys_model_2048bool', 'model.ckpt-10654.as_numpy.json.gz'), FP_len=2048)
     
     diff_scores = defaultdict()
     # Getting one prediction from test set at a time

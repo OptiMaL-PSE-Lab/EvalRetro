@@ -1,4 +1,4 @@
-# evalretro
+# EvalRetro
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -63,7 +63,6 @@ The headers within the file should contain the following columns: ["index", "tar
 The configuration for the benchmarked algorithm is shown in [the config directory](./config/raw_data.json). Specifying the configuration is important so that the data file is processed correctly by the code. 
 The structure is in json format and structured as follows: 
 ```
-{
 "key":{
     "file":"file_name.csv",       # In ./data/"key" directory
     "preprocess":bool,            # Keep this as false if data file has the correct structure
@@ -73,8 +72,8 @@ The structure is in json format and structured as follows:
     "colnames": null,             # null unless data file has different header to ["idx", "target", "reactants"]
     "type": "tmplate",            # Retrosynthesis category, One of: ["tmplate", "semi", "tfree"]
     "name": "your_name"           # Name of the algorithm
-},
-```
+}
+
 To test your own algorithm, replace the example in [the example config directory](./config/new_config.json) with your own configuration data.
 
 # Interpretability Study
@@ -107,7 +106,8 @@ The model_type can be chosen from: DMPNN, EGAT and GCN.
 
 To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the paper, run:  
 ```
+conda activate rxn_exp
 python inference.py
 ```
 
-![Example of interpretability case study](/interpret/example_interpret.png)
+![Example of interpretability case study](/examples/example_interpret.png)

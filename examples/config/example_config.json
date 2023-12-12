@@ -1,0 +1,11 @@
+{"my_algorithm":{
+    "file":"my_predictions.csv",
+    "preprocess":false,
+    "skip":false,
+    "class":"LineSeparated",
+    "delimiter":"comma",
+    "colnames": null,
+    "type": "",
+    "name": ""
+}
+}

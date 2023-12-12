@@ -11,26 +11,17 @@ from tqdm import tqdm
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) 
 results_path = os.path.join(project_root, 'results')
-data_path = os.path.join(project_root, 'data')
 
 # Add logging for info to terminal
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 class Alg(ABC):
-    def __init__(self, algname:str, check_invalid_smi:bool, skip_blank_lines:bool, remove_stereo:bool, data_dir=None):
-        self._name = algname
-        if data_dir:
-            # More flexible data directory
-            self.data_dir = data_dir
-            parent_path = os.path.dirname(os.path.abspath(data_dir))
-            self.data_dir_cleaned = os.path.join(parent_path, f'{self._name}_cleaned.csv')
-            self.file_inv_smiles = os.path.join(parent_path, f'{self._name}_inv_smiles.csv')
-        
-        else:
-            self.data_dir = os.path.join(data_path, f'{self._name}', f'{self._name}_processed.csv')
-            self.data_dir_cleaned = os.path.join(data_path, f'{self._name}', f'{self._name}_cleaned.csv')
-            self.file_inv_smiles = os.path.join(data_path, f'{self._name}', f'{self._name}_inv_smiles.csv')
+    def __init__(self, algname:str, check_invalid_smi:bool, skip_blank_lines:bool, remove_stereo:bool, data_dir):
+        self._name = algname    
+        self.data_dir = os.path.join(data_dir, f'{self._name}', f'{self._name}_processed.csv')
+        self.data_dir_cleaned = os.path.join(data_dir, f'{self._name}', f'{self._name}_cleaned.csv')
+        self.file_inv_smiles = os.path.join(data_dir, f'{self._name}', f'{self._name}_inv_smiles.csv')
             
         self.result_dir = os.path.join(results_path, f'{self._name}')
 
@@ -188,8 +179,8 @@ class LineSeparated(Alg):
     """ 
     Class for algorithms that have a line-separated datafile for predictions
     """
-    def __init__(self, algname, check_invalid_smi, skip_lines=False, check_stereo=True):
-        super().__init__(algname, check_invalid_smi, skip_lines, check_stereo)
+    def __init__(self, algname, check_invalid_smi, skip_lines=False, check_stereo=True, data_dir=None):
+        super().__init__(algname, check_invalid_smi, skip_lines, check_stereo, data_dir)
     
     def get_data(self, metric_name:str):
         uncleaned_metrics = ['invsmi', 'topk']
@@ -233,8 +224,8 @@ class IndexSeparated(Alg):
     """ 
     Class for algorithms that have an index-separated datafile for predictions
     """
-    def __init__(self, algname, check_invalid_smi, skip_lines=True, check_stereo=True):
-        super().__init__(algname, check_invalid_smi, skip_lines, check_stereo)
+    def __init__(self, algname, check_invalid_smi, skip_lines=True, check_stereo=True, data_dir=None):
+        super().__init__(algname, check_invalid_smi, skip_lines, check_stereo, data_dir)
 
     def get_data(self, metric_name:str):
         uncleaned_metrics = ['invsmi', 'topk']
