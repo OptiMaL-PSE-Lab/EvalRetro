@@ -1,10 +1,11 @@
 # evalretro
-[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-360/)
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A repository for evaluating single-step retrosynthesis algorithms.
 
-This branch corresponds to the Python 3.10 implementation of *evalretro*. The environment.yml file was updated to reflect changes in dependencies. This code was tested for **Linux** exclusively - it is suggested to use WSL2 (Ubuntu) for Windows OS.
+This branch corresponds to the Python 3.6 implementation of *EvalRetro*. This code was tested for **Linux** exclusively - it is suggested to use the v3.10 branch instead.
+This branch is **DEPRECATED**.
 
 The datafiles related to all benchmarked algorithms can be found below:
 https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0
