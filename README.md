@@ -109,4 +109,5 @@ To test the trained models (i.e. EGAT and DMPNN) and create the plots as in the 
 conda activate rxn_exp
 python inference.py
 ```
+**Note**: The plots for the GNN models may slightly differ compared to the paper due to the stochastic nature of GNNExplainer.
 ![Example of interpretability case study](/examples/example_interpret.png)
