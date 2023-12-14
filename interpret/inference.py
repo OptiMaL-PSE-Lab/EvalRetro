@@ -95,6 +95,7 @@ def explain_model(rxn, name, model_type, saved_model):
         lr = 0.135
     elif name == 'EGAT_Test_2':
         hp = 6
+        lr = 0.135
     else: 
         hp = 5
         lr = 0.14
@@ -218,7 +219,6 @@ def visualise_explanation(explanation, rxn, name, bond, split=False, custom_weig
 
     mol = Chem.MolFromSmiles(rxn)
     AllChem.ComputeGasteigerCharges(mol)
-    plt.close(fig)
 
     # Assign your custom weights to the atoms
     for i, weight in enumerate(weights):
@@ -229,6 +229,8 @@ def visualise_explanation(explanation, rxn, name, bond, split=False, custom_weig
     color_map = LinearSegmentedColormap.from_list(
       'PiWG', [PiRdBu_cmap(0), (1.0, 1.0, 1.0), PiRdBu_cmap(1)], N=255)
     fig = SimilarityMaps.GetSimilarityMapFromWeights(mol, weights, colorMap=color_map, contourLines=4, size=(1000, 1000))
+    plt.close(fig)
+
     
     if correction:
         name = f'{name}_corrected'
