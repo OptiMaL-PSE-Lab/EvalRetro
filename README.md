@@ -56,10 +56,10 @@ Within the script, the following hyperparameters can be adjusted:
 - data_path: The path to the folder that contains your file, default = ./data
 
 ### File Structure
-The file should follow one of the following two formats:
+The file should follow one of the following two formats with the **first row entry per target molecule being the ground truth reaction** i.e. N+1 predictions per target:
 
-1. **Line-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
-2. **Index-Separated** file: _N_ retrosynthesis predictions per _target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
+1. **Line-Separated** file: _N+1_ retrosynthesis predictions per _target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
+2. **Index-Separated** file: _N+1_ retrosynthesis predictions per _target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
 
 The headers within the file should contain the following columns: ["index", "target", "reactants"]
 
