@@ -45,7 +45,7 @@ python data_import.py --config_name new_config.json
 ```
 If no error is logged, the algorithm can be tested with: 
 ```
-python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'new_config.json' --quick_eval False  
+python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'new_config.json' --quick_eval True  
 ```
 Within the script, the following hyperparameters can be adjusted: 
 - k_back: Evaluation includes _k_ retrosynthesis predictions per target
