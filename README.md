@@ -49,10 +49,10 @@ To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](h
 > For further help, look at the Jupyter notebook provided in [the examples directory](./examples/evaluate_algorithm.ipynb)
 
 ### File Structure
-The file should follow **one** of the following two formats with the **first row entry per target molecule being the ground truth reaction** i.e. N+1 predictions per target:
+The file should follow **one** of the following two formats with the **first row entry per target molecule being the ground truth reaction** <br> i.e. 1 ground-truth reaction + N predictions per target:
 
-1. **Line-Separated** file: _N+1_ retrosynthesis predictions per _molecular target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
-2. **Index-Separated** file: _N+1_ retrosynthesis predictions per _molecular target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
+1. **Line-Separated** file: _N+1_ reactions per _molecular target_ are separated by an empty line (example: [TiedTransformer](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
+2. **Index-Separated** file: _N+1_ reactions per _molecular target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
 
 The headers within the file should contain the following columns: ["index", "target", "reactants"]
 
