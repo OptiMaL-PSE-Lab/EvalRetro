@@ -21,7 +21,7 @@ parser.add_argument('--invsmiles', type=int, help='Number of predictions check f
 parser.add_argument('--dup', type=int, help='Number of predictions check for duplicates', default=20)
 parser.add_argument('--stereo', type=bool, help='Whether to remove stereochemistry for fwd model', default=True)
 parser.add_argument('--check', type=bool, help='Remove invalid smiles from files', default=True)
-parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
+parser.add_argument('--config_name', type=str, help='Name of config file to use', required=True)
 parser.add_argument('--quick_eval', type=bool, help='Whether to evaluate results on the fly', default=True)
 parser.add_argument('--data_path',  type=str, help='Location of data files', default='data')
 parser.add_argument('--config_path',  type=str, help='Location of config files', default='config')

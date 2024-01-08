@@ -169,7 +169,7 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
 
     parser = ArgumentParser(description='Preprocess data for retrosynthesis algorithms')
-    parser.add_argument('--config_name', type=str, help='Name of config file to use', default='raw_data.json')
+    parser.add_argument('--config_name', type=str, help='Name of config file to use', required=True)
     parser.add_argument('--data_path',  type=str, help='Location of data files', default='data')
     parser.add_argument('--config_path',  type=str, help='Location of config files', default='config')
     args = parser.parse_args()
