@@ -5,8 +5,6 @@
     "skip":false,                  
     "class":"LineSeparated",      
     "delimiter":"comma",         
-    "colnames": null,            
-    "type": "tmplate",            
-    "name": "your_name"                        
+    "colnames": null                     
 }
 }
