@@ -83,7 +83,6 @@ def round_trip(alg, args):
 
     for k, (smiles_tar, reactants) in enumerate(alg.get_data("rt")):
         
-        # Uncleaned data always used
         if not cleaned_data:
             reactants = adjust_smiles(reactants[:k_pred_retro], 'trial')
         if alg.remove_stereo:

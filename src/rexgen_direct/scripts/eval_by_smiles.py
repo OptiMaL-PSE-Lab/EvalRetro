@@ -166,7 +166,7 @@ def edit_mol(rmol, edits):
 
         # Check if we failed/succeeded in previous step
         if mol is None:
-            print('##### Unparseable mol: {}'.format(pred_list[i]))
+            # print('##### Unparseable mol: {}'.format(pred_list[i]))
             continue
 
         # Else, try post-sanitiztion fixes in structure
