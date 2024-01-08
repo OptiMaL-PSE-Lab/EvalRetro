@@ -26,7 +26,7 @@ pip install rxnfp --no-deps
 To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](https://www.dropbox.com/sh/6ideflxcakrak10/AAAESdZq7Y0aNGWQmqCEMlcza/typed_schneider50k?dl=0&subfolder_nav_tracking=1)), follow the steps below: 
 1. Place the file containing the predictions per molecular target in the ./data/"key" directory ("key" as defined in config file - step 2.) <br />
     > Please ensure the correct layout of your prediction file as shown in [File Structure](#File-Structure)
-2. Enter the configuration details in the config .json under [the example config directory](./config/new_config.json) by replacing the example provided <br />
+2. Enter the configuration details in the config .json under [the example config directory](./config/new_config.json) by replacing the example <br />
     > Please refer to [Configuration Structure](#Configuration-File) for the layout
 3. To ensure that the file has the correct structure, run the following line of code: 
     ```
