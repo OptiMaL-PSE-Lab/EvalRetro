@@ -18,15 +18,16 @@ pip install rxnfp --no-deps
 ```
 For MacOS, replace the environment.yml file with:
 ``` 
-conda env create -n evalretro --file environment_mac.yml 
+conda env create -n evalretro --file environment_mac.yml
+pip install rxnfp --no-deps
 ```
 
 ## Testing your own algorithm
-To test your own retrosynthetic prediction on the test dataset (e.g. USPTO-50k), follow the steps below: 
+To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](https://www.dropbox.com/sh/6ideflxcakrak10/AAAESdZq7Y0aNGWQmqCEMlcza/typed_schneider50k?dl=0&subfolder_nav_tracking=1)), follow the steps below: 
 1. Place the file containing the predictions per molecular target in the ./data/"key" directory ("key" as defined in config file - step 2.) <br />
     > Please ensure the correct layout of your prediction file as shown in [File Structure](#File-Structure)
 2. Enter the configuration details in the config .json under [the example config directory](./config/new_config.json) by replacing the example provided <br />
-    > Please refer to [Config](#Configuration-File) for the configuration layout
+    > Please refer to [Configuration Structure](#Configuration-File) for the layout
 3. To ensure that the file has the correct structure, run the following line of code: 
     ```
     conda activate evalretro
@@ -45,7 +46,7 @@ To test your own retrosynthetic prediction on the test dataset (e.g. USPTO-50k),
     - data_path: The path to the folder that contains your file, default = ./data
       
 > [!TIP]   
-> For futher help, look at the example Jupyter notebook provided in [the examples directory](./examples/evaluate_algorithm.ipynb)
+> For futher help, look at the Jupyter notebook provided in [the examples directory](./examples/evaluate_algorithm.ipynb)
 
 ### File Structure
 The file should follow **one** of the following two formats with the **first row entry per target molecule being the ground truth reaction** i.e. N+1 predictions per target:
