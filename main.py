@@ -80,6 +80,7 @@ def constructor():
             print(f"Results for {retro_alg}:")
             for i,metric in enumerate(eval_metrics):
                 print(f"Top-{metric.k} {metric.__name__}: {np.round(summary_stats[i], 2)}\n")
+            print("Note: Top-k and InvSmiles are NOT given as percentages")
             print('-'*num_chars)
 
 if __name__ == "__main__":
