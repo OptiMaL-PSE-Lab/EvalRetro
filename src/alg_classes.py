@@ -58,7 +58,7 @@ class Alg(ABC):
             print_results = self._quick_eval(results, metric.index)
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
             return print_results
-        except FileNotFoundError:
+        except OSError:
             results = pd.DataFrame.from_dict(metric(self, args), orient='index')
             os.makedirs(os.path.join(results_path, f'{self._name}'))
             results.to_csv(os.path.join(results_path, f'{self._name}', f'{metric.name}.csv'))
