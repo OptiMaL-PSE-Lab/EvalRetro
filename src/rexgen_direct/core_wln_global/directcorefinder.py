@@ -14,7 +14,6 @@ import os
 This module defines the DirectCoreFinder class, which is for deploying the core finding model
 '''
 
-NK3 = 80
 batch_size = 2 # just fake it, make two 
 hidden_size = 300
 depth = 3
@@ -28,6 +27,7 @@ class DirectCoreFinder():
         self.hidden_size = hidden_size 
         self.batch_size = batch_size 
         self.depth = depth 
+        self.NK3 = 80
 
     def load_model(self, model_path=model_path):
         hidden_size = self.hidden_size 
@@ -73,7 +73,8 @@ class DirectCoreFinder():
             score = linearND(pair_hidden, 5, scope="scores")
             score = tf.reshape(score, [batch_size, -1])
             bmask = tf.compat.v1.to_float(tf.equal(self.label, INVALID_BOND)) * 10000
-            topk_scores, topk = tf.nn.top_k(score - bmask, k=NK3)
+            self.NK3 = tf.minimum(self.NK3, tf.shape(score)[1])
+            topk_scores, topk = tf.nn.top_k(score - bmask, k=self.NK3)
             label_dim = tf.shape(self.label)[1]
             
             # What will be used for inference?
@@ -112,6 +113,7 @@ class DirectCoreFinder():
 
         cur_topk, cur_sco, cur_dim, cur_att_score = self.session.run(self.predict_vars,
             feed_dict=feed_map)
+        top_ksize = cur_topk.shape[1]
         cur_dim = int(math.sqrt(cur_dim/5)) # important! changed to divide by 5
 
         cur_topk = cur_topk[0,:]
@@ -124,8 +126,8 @@ class DirectCoreFinder():
         # NOTE: we don't filter out molecules known to be reagents, but during training, 
         # molecules known to be reagents/solvents are not allowed to be involved with bond
         # changes.
-
-        for j in range(NK3):
+        
+        for j in range(top_ksize):
             k = cur_topk[j]
             bindex = k % nbos
             y = ((k - bindex) / nbos) % cur_dim + 1

@@ -25,6 +25,7 @@ def megan_preprocess(obj):
         target_list = targets.tolist() + [""]
         df_old.iloc[old_row+1:row+1]["target"].values[:] = target_list
         old_row = row
+    df_old.rename_axis("idx", inplace=True)
     
 def other_algs(obj):
       pass
