@@ -180,9 +180,11 @@ def edit_mol(rmol, edits):
                     Chem.SanitizeMol(out[0][0])
                     pred_mols[i] = Chem.MolFromSmiles(Chem.MolToSmiles(out[0][0]))
                 except Exception as e:
-                    print(e)
-                    print('Could not sanitize postsani reaction product: {}'.format(Chem.MolToSmiles(out[0][0])))
-                    print('Original molecule was: {}'.format(Chem.MolToSmiles(mol)))
+                    # stop printing the errors as they are too verbose
+                    continue
+                    # print(e)
+                    # print('Could not sanitize postsani reaction product: {}'.format(Chem.MolToSmiles(out[0][0])))
+                    # print('Original molecule was: {}'.format(Chem.MolToSmiles(mol)))
     pred_smiles = [Chem.MolToSmiles(pred_mol) for pred_mol in pred_mols if pred_mol is not None]
 
     return pred_smiles

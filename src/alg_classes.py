@@ -146,7 +146,8 @@ class Alg(ABC):
                     continue
                     # Will throw errors from invalid smiles
             else:
-                continue
+                if isinstance(targ,str):
+                    df_alg.at[index, "reactants"] = "Failed"
 
         df_alg = df_alg.iloc[:,-3:]
         df_alg.to_csv(self.data_dir, index=False)

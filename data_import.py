@@ -100,6 +100,7 @@ class TextCsvData(LoadData):
                 df_txt = pd.read_csv(os.path.join(args.data_path, self._alg_name, self._file_name),
                 delimiter=self._delimiter,
                 usecols = range(len(self.colnames)+1),
+                header=None,
                 skip_blank_lines = self.skiplines,
                 index_col=0
             )
