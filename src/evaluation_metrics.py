@@ -199,17 +199,21 @@ def top_k(alg, args):
     top_k.index = "top_k"
     top_k.k = args.k_back
 
-    k_dict = {'1': 0, '3': 0, '5': 0, '10': 0, '20':0}
+    k_pred_retro = args.k_back
+
+    k_dict = {'1': 0, '3': 0, '5': 0, '10': 0, '20':0, '50':0}
     keys = k_dict.keys()
     for i, (gt, reactants) in enumerate(alg.get_data("topk")):
-        acc, k = top_k_accuracy(gt, reactants[:20])
+        acc, k = top_k_accuracy(gt, reactants[:k_pred_retro])
         keys_to_update = [key for key in keys if int(key) >= k]
         for key in keys_to_update:
             k_dict[key] += acc
     for key in keys:
         k_dict[key] /= i
 
-    return {"top-k accuracy":k_dict}
+    filtered_k_dict = {key: value for key, value in k_dict.items() if int(key) <= k_pred_retro} 
+
+    return {"top-k accuracy":filtered_k_dict}
 
 
 # ** Single metrics found below ** 
