@@ -23,6 +23,9 @@ pip install rxnfp --no-deps
 ```
 
 ## Testing your own algorithm
+<details>
+  <summary>📚 Discover more about testing your own single-step algorithm!</summary>
+    
 To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](https://www.dropbox.com/sh/6ideflxcakrak10/AAAESdZq7Y0aNGWQmqCEMlcza/typed_schneider50k?dl=0&subfolder_nav_tracking=1)), follow the steps below: 
 1. Place the file containing the predictions per molecular target in the ./data/"key" directory ("key" as defined in config file - step 2.) <br />
     > Please ensure the correct layout of your prediction file as shown in [File Structure](#File-Structure)
@@ -69,8 +72,12 @@ The structure is in .json format and should contain:
     "preprocess":bool,            # false - in most cases
 }
 ```
+</details>
 
 ## Reproducibility
+<details>
+  <summary>🔍 Step-by-step guide on how to reproduce results presented in the paper.</summary>
+
 To reproduce results in paper, follow the steps below: 
 1. Download all data files from dropbox and place inside ./data directory <br />
     > The datafiles related to all benchmarked algorithms can be found below:
@@ -82,8 +89,12 @@ To reproduce results in paper, follow the steps below:
    python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'raw_data.json' --quick_eval False
    ```
 3. Run `python plotting.py` to generate figures and tables
+</details>
 
 # Interpretability Study
+<details>
+  <summary>🚀 Click here to find out more details about interpretability of ML-based retrosynthesis models.</summary>
+
 The code related to the interpretability study is found in [the interpretability folder](./interpret).
 
 ## Environment
@@ -118,3 +129,5 @@ python inference.py
 ```
 **Note**: The plots for the GNN models may slightly differ compared to the paper due to the stochastic nature of GNNExplainer.
 ![Example of interpretability case study](/examples/example_interpret.png)
+
+</details>
