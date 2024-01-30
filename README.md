@@ -25,7 +25,8 @@ pip install rxnfp --no-deps
 ## Testing your own algorithm
 <details>
   <summary>📚 Discover more about testing your own single-step algorithm!</summary>
-    
+<br>
+
 To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](https://www.dropbox.com/sh/6ideflxcakrak10/AAAESdZq7Y0aNGWQmqCEMlcza/typed_schneider50k?dl=0&subfolder_nav_tracking=1)), follow the steps below: 
 1. Place the file containing the predictions per molecular target in the ./data/"key" directory ("key" as defined in config file - step 2.) <br />
     > Please ensure the correct layout of your prediction file as shown in [File Structure](#File-Structure)
@@ -77,8 +78,8 @@ The structure is in .json format and should contain:
 ## Reproducibility
 <details>
   <summary>🔍 Step-by-step guide on how to reproduce results presented in the paper.</summary>
+<br>
 
-To reproduce results in paper, follow the steps below: 
 1. Download all data files from dropbox and place inside ./data directory <br />
     > The datafiles related to all benchmarked algorithms can be found below:
     > https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0 
@@ -94,6 +95,7 @@ To reproduce results in paper, follow the steps below:
 # Interpretability Study
 <details>
   <summary>🚀 Click here to find out more details about interpretability of ML-based retrosynthesis models.</summary>
+<br>
 
 The code related to the interpretability study is found in [the interpretability folder](./interpret).
 
