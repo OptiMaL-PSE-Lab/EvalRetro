@@ -41,7 +41,7 @@ To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](h
     ```
     python main.py --k_back 10 --k_forward 2 --invsmiles 20 --fwd_model 'gcn' --config_name 'new_config.json' --quick_eval True  
     ```
-    Within the script, the following hyperparameters can be adjusted: 
+    Within the script, the following arguments can be adjusted: 
     - **k_back**: Evaluation includes _k_ retrosynthesis predictions per target
     - **k_forward**: Forward model includes _k_ target predictions per reactant set.
     - **fwd_model**: Type of forward reaction prediction model. So far, only _gcn_ is included.
@@ -49,7 +49,6 @@ To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](h
     - **quick_eval**: Boolean - prints the results (averages) for evaluation metrics directly to the terminal.
     - **data_path**: The path to the folder that contains your file, default = ./data
       
-> [!TIP]   
 > For further help, look at the Jupyter notebook provided in [the examples directory](./examples/evaluate_algorithm.ipynb)
 
 ### File Structure
