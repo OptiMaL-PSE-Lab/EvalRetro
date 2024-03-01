@@ -81,7 +81,7 @@ The structure is in .json format and should contain:
 
 1. Download all data files from dropbox and place inside ./data directory <br />
     > The datafiles related to all benchmarked algorithms can be found below: <br>
-    > https://figshare.com/s/b0229784c1b9a05a0f4f
+    > https://doi.org/10.6084/m9.figshare.25325623.v1
 2. Run the following lines of code within your terminal:
    ```
    conda activate evalretro
@@ -112,7 +112,7 @@ pip install rdkit
 
 ## Data Files
 Install both folders within ./data_interpretability using the following link and place them into the ./interpret directory: <br>
-https://figshare.com/s/8d5c8df8099a0395667f
+https://doi.org/10.6084/m9.figshare.25325644.v1
 
 ## Reproducibility
 Pre-trained models are provided in the dropbox. However, models can be retrained by running: 
