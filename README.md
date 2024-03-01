@@ -54,8 +54,8 @@ To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](h
 ### File Structure
 The file should follow **one** of the following two formats with the **first row entry per target molecule being the ground truth reaction** i.e. 1 ground-truth reaction + N predictions per target:
 
-1. **Line-Separated** file: _N+1_ reactions per _molecular target_ are separated by an empty line (example: [TiedT](https://www.dropbox.com/home/data_retroalgs/tiedtransformer?preview=tiedtransformer_pred.csv))
-2. **Index-Separated** file: _N+1_ reactions per _molecular target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://www.dropbox.com/home/data_retroalgs/g2retro?preview=g2retro_pred.csv))
+1. **Line-Separated** file: _N+1_ reactions per _molecular target_ are separated by an empty line (example: [TiedT](https://figshare.com/articles/journal_contribution/USPTO-50k/25325623?file=44795752))
+2. **Index-Separated** file: _N+1_ reactions per _molecular target_ are separated by different indices (example: [G<sup>2</sup>Retro](https://figshare.com/articles/journal_contribution/USPTO-50k/25325623?file=44795767))
 
 The headers within the file should contain the following columns: ["index", "target", "reactants"]
 
@@ -80,8 +80,8 @@ The structure is in .json format and should contain:
 <br>
 
 1. Download all data files from dropbox and place inside ./data directory <br />
-    > The datafiles related to all benchmarked algorithms can be found below:
-    > https://www.dropbox.com/sh/vuiksmg6p2hr8ie/AAAR9pW5TALhmM9mtUNvwF4ja?dl=0 
+    > The datafiles related to all benchmarked algorithms can be found below: <br>
+    > https://figshare.com/s/b0229784c1b9a05a0f4f
 2. Run the following lines of code within your terminal:
    ```
    conda activate evalretro
@@ -111,8 +111,8 @@ pip install rdkit
 ```
 
 ## Data Files
-Install both folders from the following link and place them into the ./interpret directory:
-https://www.dropbox.com/sh/h5jnlmc4caebe3u/AADwIUVvKPg52oeGQWAMjogUa?dl=0
+Install both folders within ./data_interpretability using the following link and place them into the ./interpret directory: <br>
+https://figshare.com/s/8d5c8df8099a0395667f
 
 ## Reproducibility
 Pre-trained models are provided in the dropbox. However, models can be retrained by running: 
