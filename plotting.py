@@ -110,7 +110,7 @@ def plot_rt(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
             bins = np.linspace(0, 1, 11)
             rt_data['bin'] = pd.cut(rt_data['acc_mean'], bins=bins, include_lowest=False)
             rt_acc = rt_data.loc[:,['acc_mean', 'bin']]
-            counts = rt_acc.groupby('bin').count()
+            counts = rt_acc.groupby('bin', observed=False).count()
             # Get extra column where the bin is set to min of bin range
             counts['bin'] = counts.index.map(lambda x: x.left)
             alg_acc[f'{retro_alg}'] = counts
@@ -252,7 +252,7 @@ def plot_div(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
             bins = list(range(0, 9))
             div_data['bin'] = pd.cut(div_data['No_classes'], bins=bins, include_lowest=True)
             div = div_data.loc[:,['No_classes', 'bin']]
-            counts = div.groupby('bin').count()
+            counts = div.groupby('bin', observed=False).count()
             alg_div[f'{retro_alg}'] = counts
             cnt +=1
         except:
@@ -366,7 +366,7 @@ def plot_dup(algorithms=algorithms, fig_dir=fig_dir, results_dir=results_dir):
             bins = np.linspace(0, 1, 11)
             dup_data['bin'] = pd.cut(dup_data['dup'], bins=bins, include_lowest=False)
             rt_acc = dup_data.loc[:,['dup', 'bin']]
-            counts = rt_acc.groupby('bin').count()
+            counts = rt_acc.groupby('bin', observed=False).count()
             # Get extra column where the bin is set to min of bin range
             counts['bin'] = counts.index.map(lambda x: x.left)
             alg_dup[f'{retro_alg}'] = counts
@@ -407,9 +407,11 @@ def table_round_trip(algorithms=algorithms, results_dir=results_dir):
         try:
             rt_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Round-trip.csv"))
             # compute mean for each column
+            # remove the first column
+            rt_data = rt_data.iloc[:,1:]
             rt_data_mean = rt_data.mean(axis=0)
             # round values to 3 decimal places
-            rt_data_mean = rt_data_mean.round(2)
+            rt_data_mean = rt_data_mean.round(3)
             top_k = [1, 3, 5, 10]
             metrics = ["acc","cov"]
             # get mean for each top-k
@@ -466,10 +468,10 @@ def table_topk(algorithms=algorithms, results_dir=results_dir):
     """
     alg_topk = {alg:[] for alg in algorithms}
     for retro_alg in algorithms:
-        k = ['Top_1','Top_3','Top_5','Top_10','Top_20']
+        k = ['Top_1','Top_3','Top_5','Top_10']
         try:
             topk_data = pd.read_csv(os.path.join(results_dir, retro_alg.lower(), "Top-k.csv"))
-            topk_data = topk_data.applymap(lambda x: x*100)
+            topk_data = topk_data.map(lambda x: x*100)
             alg_topk[f'{retro_alg}'] = np.round(topk_data.iloc[0,1:].to_list(),1)
         except Exception as e:
             print(e)
