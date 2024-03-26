@@ -4,14 +4,14 @@ import shutil
 import os
 import argparse 
 import json
-import numpy as np
-import warnings
+import numpy as np # type: ignore
 # Disable tensorflow warning if no GPU found
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.alg_classes import LineSeparated, IndexSeparated
-from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, invsmiles, top_k
+from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, valsmiles, top_k
 from src.utils.fwd_mdls import gcn_forward 
+from src.utils.utilities import str2bool
 
 parser = argparse.ArgumentParser(description='Evaluate retrosynthesis algorithms')
 parser.add_argument('--k_back', type=int, help='Number of predictions made per target for retrosynthesis', default=10)
@@ -19,10 +19,10 @@ parser.add_argument('--k_forward', type=int, help='Number of predictions made pe
 parser.add_argument('--fwd_model', type=str, help='Name of forward model to use', default='gcn')
 parser.add_argument('--invsmiles', type=int, help='Number of predictions check for invalid smiles per target', default=20)
 parser.add_argument('--dup', type=int, help='Number of predictions check for duplicates', default=20)
-parser.add_argument('--stereo', type=bool, help='Whether to remove stereochemistry for fwd model', default=True)
-parser.add_argument('--check', type=bool, help='Remove invalid smiles from files', default=True)
+parser.add_argument('--stereo', type=str2bool, help='Whether to remove stereochemistry for fwd model', default=True)
+parser.add_argument('--check', type=str2bool, help='Remove invalid smiles from files', default=True)
 parser.add_argument('--config_name', type=str, help='Name of config file to use', required=True)
-parser.add_argument('--quick_eval', type=bool, help='Whether to evaluate results on the fly', default=True)
+parser.add_argument('--quick_eval', type=str2bool, help='Whether to evaluate results on the fly', default=True)
 parser.add_argument('--data_path',  type=str, help='Location of data files', default='data')
 parser.add_argument('--config_path',  type=str, help='Location of config files', default='config')
 
@@ -48,9 +48,9 @@ logging.getLogger().addHandler(stream_handler)
 terminal_width = shutil.get_terminal_size().columns
 num_chars = terminal_width - 1  # subtract 1 to account for newline character
 
-eval_metrics = [diversity, duplicates, invsmiles, top_k, eval_scscore, round_trip]
+eval_metrics = [diversity, duplicates, valsmiles, top_k, eval_scscore, round_trip]
 # List foldernames under Data directory 
-algorithms = [f for f in os.listdir(os.path.join(cwd,args.data_path)) if f != ".gitkeep"]
+algorithms = config.keys()
 alg_type = {"LineSeparated": LineSeparated, "IndexSeparated": IndexSeparated}
 
 def constructor():
@@ -76,11 +76,11 @@ def constructor():
 
         # Print results to terminal:
         if args.quick_eval:
+            print('Metrics scaled between [0,1] with 1 being the best!')
             print('-'*num_chars)
             print(f"Results for {retro_alg}:")
             for i,metric in enumerate(eval_metrics):
                 print(f"Top-{metric.k} {metric.__name__}: {np.round(summary_stats[i], 2)}\n")
-            print("Note: Top-k and InvSmiles are NOT given as percentages")
             print('-'*num_chars)
 
 if __name__ == "__main__":

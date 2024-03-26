@@ -18,23 +18,18 @@ from src.rexgen_direct.core_wln_global.directcorefinder import DirectCoreFinder
 # Disable tensorflow warning 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-directcorefinder = DirectCoreFinder()
-directcorefinder.load_model()
-directcandranker = DirectCandRanker(TOPK=2)
-directcandranker.load_model()
+def init_fwd(k_eval):
+    directcorefinder = DirectCoreFinder()
+    directcorefinder.load_model()
+    directcandranker = DirectCandRanker(TOPK=k_eval)
+    directcandranker.load_model()
 
-def gcn_forward(reactants, k_eval=2, directcorefinder=directcorefinder, directcandranker=directcandranker):
+    return directcorefinder, directcandranker
+
+def gcn_forward(reactants, directcorefinder:DirectCoreFinder, directcandranker:DirectCandRanker):
     """  
     Implementation of gcn forward model for all predicted reactants for single target 
     """
-  
-    if k_eval != directcandranker.TOPK:
-        directcorefinder = DirectCoreFinder()
-        directcorefinder.load_model()
-
-        directcandranker = DirectCandRanker(TOPK=k_eval)
-        directcandranker.load_model()
-    
     predictions = defaultdict()
 
     for i,react in enumerate(reactants):
@@ -59,7 +54,8 @@ def gcn_forward(reactants, k_eval=2, directcorefinder=directcorefinder, directca
     
 if __name__ == "__main__":
     react = ["CN(C)c1cc(S(C)(=O)=O)ccc1-n1ncc2c(OCc3ccccc3)ncnc21", "COc1ncnc2c1cnn2-c1ccc(S(C)(=O)=O)cc1N(C)C","C=O.CNc1cc(S(C)(=O)=O)ccc1-n1ncc2c(O)ncnc21"]
-    predictions = gcn_forward(react)
+    directcorefinder, directcandranker = init_fwd(2)
+    predictions = gcn_forward(react, directcorefinder, directcandranker)
     for pred in predictions.values():
         print(pred)
         print("CN(C)c1cc(S(C)(=O)=O)ccc1-n1ncc2c(O)ncnc21")

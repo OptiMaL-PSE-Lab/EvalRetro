@@ -1,12 +1,12 @@
 """ 
 Define all evaluation metrics in this module
-Currently included: ScScore, Round-trip accuracy and coverage and Class diversity 
+Currently included: ScScore, Round-trip accuracy and coverage, Class diversity, Duplicity and Invalidity
+* * Future inclusion: Novelty metric (possibly based on templates) 
 
 """
 import os
 import pickle
 
-import logging
 import numpy as np
 from collections import defaultdict, Counter
 from rdkit import Chem
@@ -14,7 +14,7 @@ from rxnfp.transformer_fingerprints import RXNBERTFingerprintGenerator
 
 from src.utils.sc_score import SCScorer 
 from src.utils.utilities import *
-from src.utils.fwd_mdls import gcn_forward
+from src.utils.fwd_mdls import gcn_forward, init_fwd
 
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +80,7 @@ def round_trip(alg, args):
     round_trip.k = args.k_back
     rt_scores = defaultdict(dict)
     cleaned_data = alg.check_smi
+    model_init = init_fwd(k_pred_forw)
 
     for k, (smiles_tar, reactants) in enumerate(alg.get_data("rt")):
         
@@ -89,7 +90,7 @@ def round_trip(alg, args):
             smiles_tar, reactants = alg.stereo(smiles_tar, reactants)
         target = smiles_tar
         reactants = reactants[:k_pred_retro]
-        fwd_predictions = fwd_model(reactants, k_pred_forw)
+        fwd_predictions = fwd_model(reactants, *model_init)
         
         rt_acc, top_k_acc = calculate_rtacc(fwd_predictions, target)
         rt_cov, top_k_cov = calculate_rtcov(fwd_predictions, target, k_pred_retro)
@@ -101,7 +102,8 @@ def round_trip(alg, args):
 
 def diversity(alg, args):
     """ 
-    Calculation of class diversity as proposed by Schwaller
+    Calculation of class diversity as proposed by Schwaller et. al.
+    The metric is normalized to 0-1, with 1 being the most diverse i.e. all 10 reaction classes
     """
     diversity.name = "Diversity"
     diversity.index = "No_classes"
@@ -126,7 +128,7 @@ def diversity(alg, args):
         classes_count = Counter(rxn_classes)
         classes, counts = zip(*classes_count.items())
         classes, counts = tuple(classes), tuple(counts)
-        rxn_classes = len(set(rxn_classes))
+        rxn_classes = len(set(rxn_classes))/10 # Normalizing to 0-1
         div_scores[f"{i}_{smiles_tar}"] = {"No_classes":rxn_classes, "Classes":classes, "Counts":counts}
     return div_scores
 
@@ -157,11 +159,15 @@ def duplicates(alg, args):
     return dup
 
 
-def invsmiles(alg, args):
+def valsmiles(alg, args):
+    """
+    Calculation of percentage of invalid / valid smiles in dataset.
+    Val_k = 1 - Inv_k
+    """
 
-    invsmiles.name = "InvSmiles"
-    invsmiles.index = "top_k"
-    invsmiles.k = args.invsmiles
+    valsmiles.name = "InvSmiles"
+    valsmiles.index = "invsmi"
+    valsmiles.k = args.invsmiles
 
     k_pred_retro = args.invsmiles
     top_k_invalid = []

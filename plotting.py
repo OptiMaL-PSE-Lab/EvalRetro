@@ -1,5 +1,6 @@
-import logging
 import json
+import logging
+import math
 import os
 import pickle
 import matplotlib.pyplot as plt
@@ -42,7 +43,7 @@ results_dir = os.path.join(project_dir, 'results')
 fig_dir = os.path.join(project_dir, "figs")
 config_path = os.path.join(project_dir, "config")
 
-with open(os.path.join(config_path,"raw_data.json"), 'r') as f:
+with open(os.path.join(config_path,"par.json"), 'r') as f:
     configs = json.load(f)
 
 alg_data = [(configs[alg]["name"], configs[alg]["type"]) for alg in configs.keys()]
@@ -50,6 +51,13 @@ alg_data = [(configs[alg]["name"], configs[alg]["type"]) for alg in configs.keys
 alg_data.sort(key=lambda x: x[1])
 algorithms = [alg[0] for alg in alg_data]
 
+def my_round(x, decimals=2):
+    multiplier = 10 ** decimals
+    threshold = 0.5 / multiplier
+    rounded_value = round(x * multiplier)
+    if rounded_value - x * multiplier < threshold:
+        return math.floor(x * multiplier) / multiplier
+    return math.ceil(x * multiplier) / multiplier
 
 def plot_layout(cnt):
     """
@@ -462,6 +470,8 @@ def table_invalid_smi(algorithms=algorithms, results_dir=results_dir):
     display(df)
     df.to_csv(os.path.join(fig_dir, 'inv_smi_table.csv'))
 
+    return 1 - df["Top-20"]/100
+
 def table_topk(algorithms=algorithms, results_dir=results_dir):
     """
     The standard retrosynthesis top-k accuracy 
@@ -485,20 +495,14 @@ def table_topk(algorithms=algorithms, results_dir=results_dir):
     df.to_csv(os.path.join(fig_dir, 'topk_table.csv'))
 
 # Make summary table
-
-def make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_jenson, alg_dup_mean, fig_dir=fig_dir):
+def make_sum_table(alg_acc_mean, alg_div_mean, alg_val_mean, alg_dup_mean, alg_sc_mean, fig_dir=fig_dir):
     """ 
     Make summary table of results 
     """
-    # Make dataframe from dictionaries
-    df = pd.DataFrame([alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_jenson, alg_dup_mean])
-    # Transpose dataframe
+    df = pd.DataFrame([alg_acc_mean, alg_div_mean, alg_val_mean, alg_dup_mean, alg_sc_mean])
     df = df.T
-    # Rename columns
-    df.columns = ['Rt Accuracy', 'Rt Cov', 'ScScore', 'Diversity', 'Jenson-Shannon', 'Duplicate Index']
-    # Round values
-    df = df.round(2)
-    # Save table
+    df.columns = ['Rt Accuracy', 'Diversity', 'Validity', 'Duplicity', 'SCScore']
+    df = df.map(my_round)
     df.to_csv(os.path.join(fig_dir, 'summary_table.csv'))
     print("\nSummary Table:")
     display(df)
@@ -511,8 +515,8 @@ if __name__ == '__main__':
     alg_sc_mean = plot_sc()
     alg_dup_mean = plot_dup()
     alg_sim = plot_div_dist()
-    # Make summary table
+    alg_val_mean = table_invalid_smi()
+    # Make summary tables
     table_topk()
-    table_invalid_smi()
     table_round_trip()
-    df = make_sum_table(alg_acc_mean, alg_cov, alg_sc_mean, alg_div_mean, alg_sim, alg_dup_mean)
+    df = make_sum_table(alg_acc_mean, alg_div_mean, alg_val_mean, alg_dup_mean, alg_sc_mean)
