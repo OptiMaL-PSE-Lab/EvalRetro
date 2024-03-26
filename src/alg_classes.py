@@ -172,6 +172,8 @@ class Alg(ABC):
         """
         if index_name == 'top_k':
             print_results = results.iat[-1,-1]
+        elif index_name == 'invsmi':
+            print_results = 1 - results.iat[-1,-1] # convert invalidity into validity metric
         else:
             print_results = results[index_name].mean()    
         return print_results

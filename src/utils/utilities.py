@@ -1,3 +1,4 @@
+import argparse
 import os
 import torch
 import numpy as np
@@ -92,9 +93,8 @@ def load_model_tokenizer(model, force_no_cuda=False):
 def adjust_smiles(reactant_smiles, metric_name):
     """
     This is called in case the uncleaned datasets are used for evaluation.
-    Since the datasets are not cleaned, some smiles are invalid and cause errors when parsing
-    1) For rt metrics, a dummy parseable smile is inserted at invalid positions
-        2) For ScScore and Diversity, the smile is popped from the list
+    Since the datasets are not cleaned, some smiles are invalid and cause errors when parsing.
+    For the metrics, the smiles are popped from the list of reactants, if they are invalid.
     """
     if metric_name == 'div':
         reactants = [rxn.split('>>')[0] for rxn in reactant_smiles]
@@ -107,7 +107,7 @@ def adjust_smiles(reactant_smiles, metric_name):
         try:
             Chem.MolToSmiles(Chem.MolFromSmiles(rxn))
         except:
-                reactant_smiles.pop(i)
+            reactant_smiles.pop(i)
     return reactant_smiles
 
 def top_k_accuracy(gt, reactants):
@@ -120,3 +120,13 @@ def top_k_accuracy(gt, reactants):
     
     return 0, k+1
     
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
