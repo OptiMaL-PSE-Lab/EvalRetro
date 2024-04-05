@@ -1,5 +1,8 @@
-<img src="https://avatars.githubusercontent.com/u/81195336?s=200&v=4" alt="Optimal PSE logo" title="OptiMLPSE" align="right" height="150" />
-</a>
+<div style="float:right; margin-left:20px; margin-top: -30px;">
+    <img src="https://avatars.githubusercontent.com/u/81195336?s=200&v=4" alt="Optimal PSE logo" title="OptiMLPSE" height="150" align="right"/>
+</div>
+<br>
+<br>
 
 # EvalRetro
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
