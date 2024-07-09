@@ -43,7 +43,7 @@ results_dir = os.path.join(project_dir, 'results')
 fig_dir = os.path.join(project_dir, "figs")
 config_path = os.path.join(project_dir, "config")
 
-with open(os.path.join(config_path,"par.json"), 'r') as f:
+with open(os.path.join(config_path,"raw_data.json"), 'r') as f:
     configs = json.load(f)
 
 alg_data = [(configs[alg]["name"], configs[alg]["type"]) for alg in configs.keys()]

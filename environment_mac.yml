@@ -17,3 +17,4 @@ dependencies:
       - rdkit-pypi==2022.9.5
       - tensorflow==2.14.1
       - transformers==4.35.2
+      - ipython==8.22.1
