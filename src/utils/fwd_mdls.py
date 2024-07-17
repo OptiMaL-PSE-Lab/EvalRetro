@@ -1,9 +1,8 @@
 """ 
-This package was taken from: https://github.com/connorcoley/rexgen_direct
+These packages were taken from: https://github.com/connorcoley/rexgen_direct and https://github.com/kaist-amsg/LocalTransform
 Full credits go to the authors.
 """
 import os
-import logging
 import warnings
 from collections import defaultdict
 from rdkit import Chem
@@ -13,18 +12,39 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from src.rexgen_direct.rank_diff_wln.directcandranker import DirectCandRanker
 from src.rexgen_direct.core_wln_global.directcorefinder import DirectCoreFinder
+from src.localtransform.synthesis import LocalTransform
 
 
 # Disable tensorflow warning 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-def init_fwd(k_eval):
-    directcorefinder = DirectCoreFinder()
-    directcorefinder.load_model()
-    directcandranker = DirectCandRanker(TOPK=k_eval)
-    directcandranker.load_model()
+def init_fwd(k_eval, model_type):
+    if model_type == "gcn_forward":
+        directcorefinder = DirectCoreFinder()
+        directcorefinder.load_model()
+        directcandranker = DirectCandRanker(TOPK=k_eval)
+        directcandranker.load_model()
+        instance_models = [directcorefinder, directcandranker]
+    elif model_type == "localt_forward":
+        localtransform = LocalTransform(TOPK=k_eval)
+        instance_models = [localtransform]
+    return instance_models
 
-    return directcorefinder, directcandranker
+
+def localt_forward(reactants, localtransform:LocalTransform):
+    """  
+    Implementation of local transform model for all predicted reactants for single target
+    """
+    try: 
+        outcomes = localtransform.predict_product(reactants)
+        for key, val in outcomes.items():
+            outcomes[key] = [Chem.MolToSmiles(Chem.MolFromSmiles(smi), canonical=True, kekuleSmiles=True) for smi in val]
+    except Exception as e:
+        print(e)      
+        outcomes = {}
+
+    return outcomes
+    
 
 def gcn_forward(reactants, directcorefinder:DirectCoreFinder, directcandranker:DirectCandRanker):
     """  
@@ -44,7 +64,7 @@ def gcn_forward(reactants, directcorefinder:DirectCoreFinder, directcandranker:D
                 pred_k += smiles_can
         except Exception as e:
             # Log something here to warn user 
-            print(f"{e}")
+            print(e)
             pred_k = []
         finally:
             predictions.update({f"set_{str(i)}": pred_k})

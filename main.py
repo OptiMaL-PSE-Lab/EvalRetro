@@ -10,7 +10,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, valsmiles, top_k
-from src.utils.fwd_mdls import gcn_forward 
+from src.utils.fwd_mdls import gcn_forward, localt_forward
 from src.utils.utilities import str2bool
 
 parser = argparse.ArgumentParser(description='Evaluate retrosynthesis algorithms')
@@ -33,7 +33,7 @@ with open(os.path.join(cwd, args.config_path, args.config_name), 'r') as f:
     config = json.load(f)
 
 # Create dict for fwd models
-fwd_models = {"gcn": gcn_forward}
+fwd_models = {"gcn": gcn_forward, "lct": localt_forward}
 args.fwd_model = fwd_models[args.fwd_model]
 
 logging.basicConfig(filename='logs/main.log',level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
