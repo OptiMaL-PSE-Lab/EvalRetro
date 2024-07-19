@@ -22,12 +22,12 @@ from src.rexgen_direct.core_wln_global.mol_graph import atom_fdim as adim, bond_
 smiles2graph_batch = partial(_s2g, idxfunc=lambda x:x.GetIntProp('molAtomMapNumber') - 1)
 
 class DirectCoreFinder():
-    def __init__(self, hidden_size=hidden_size, batch_size=batch_size, 
+    def __init__(self, TOPK, hidden_size=hidden_size, batch_size=batch_size, 
             depth=depth):
         self.hidden_size = hidden_size 
         self.batch_size = batch_size 
         self.depth = depth 
-        self.NK3 = 80
+        self.NK3 = TOPK
 
     def load_model(self, model_path=model_path):
         hidden_size = self.hidden_size 

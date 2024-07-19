@@ -51,6 +51,7 @@ def calculate_rtacc(fwd_preds, target):
     rt_acc.astype(int)
     rt_acc = np.average(rt_acc, axis=0)
     # Add top k prediction to the dictionary
+    #* This will only return values up to len(val) -> if there a less valid smiles than k_back, no value will be returned
     top_k_acc = {f"acc_top_{i+1}":np.round(np.average(vals[:i+1], axis=0),3) for i,_ in enumerate(vals)}
 
     return rt_acc, top_k_acc

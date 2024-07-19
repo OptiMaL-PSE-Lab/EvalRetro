@@ -46,7 +46,6 @@ class LocalTransform():
         for site in ['real', 'virtual']:
             template_df = pd.read_csv('%s/%s_templates.csv' % (self.data_dir, site))
             template_dict = {template_df['Class'][i]: template_df['Template'][i].split('_') for i in template_df.index}
-            print ('loaded %s %s templates' % (len(template_dict), site))
             template_dicts[site[0]] = template_dict
         template_infos = pd.read_csv('%s/template_infos.csv' % self.data_dir)
         template_infos = {template_infos['Template'][i]: {
@@ -122,7 +121,7 @@ class LocalTransform():
                 if len(collector.predictions) >= self.k_eval:
                     break
             sorted_predictions = [k for k, v in sorted(collector.predictions.items(), key=lambda item: -item[1]['score'])]
-            results_product[f"set_{i}"] = sorted_predictions[:3]
+            results_product[f"set_{i}"] = sorted_predictions[:self.k_eval]
                 
         return results_product
 
@@ -138,4 +137,3 @@ if __name__ == "__main__":
         reactant_list = [rxn.split('>>')[0] for rxn in rxns]
         # set atom map number 0 for reactants
         results_dict = model.predict_product(reactant_list, verbose = 0)
-    print(results_dict)

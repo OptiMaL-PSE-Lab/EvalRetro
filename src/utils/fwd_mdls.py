@@ -20,7 +20,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def init_fwd(k_eval, model_type):
     if model_type == "gcn_forward":
-        directcorefinder = DirectCoreFinder()
+        directcorefinder = DirectCoreFinder(TOPK=20)
         directcorefinder.load_model()
         directcandranker = DirectCandRanker(TOPK=k_eval)
         directcandranker.load_model()
@@ -34,17 +34,35 @@ def init_fwd(k_eval, model_type):
 def localt_forward(reactants, localtransform:LocalTransform):
     """  
     Implementation of local transform model for all predicted reactants for single target
-    """
-    try: 
-        outcomes = localtransform.predict_product(reactants)
-        for key, val in outcomes.items():
-            outcomes[key] = [Chem.MolToSmiles(Chem.MolFromSmiles(smi), canonical=True, kekuleSmiles=True) for smi in val]
-    except Exception as e:
-        print(e)      
-        outcomes = {}
 
-    return outcomes
+    """
+    #* Add a heuristic that len(reactant) > 6 to avoid computational errors in batch inference 
+    min_len = min([len(rct) for rct in reactants])
     
+    if min_len > 6:
+        # do faster batch inference
+        try: 
+            outcomes = localtransform.predict_product(reactants)
+            for key, val in outcomes.items():
+                outcomes[key] = [Chem.MolToSmiles(Chem.MolFromSmiles(smi), canonical=True, kekuleSmiles=True) for smi in val]
+        except Exception as e:
+            print(e)      
+            outcomes = {}
+        return outcomes
+    else: 
+        predictions = defaultdict()
+        # do slower individual inference 
+        for i, rct in enumerate(reactants): 
+            try: 
+                outcome = localtransform.predict_product(rct)["set_0"]
+                pred_k = [Chem.MolToSmiles(Chem.MolFromSmiles(smi), canonical=True, kekuleSmiles=True) for smi in outcome]
+            except Exception as e: 
+                print(e)
+                pred_k = []
+            finally:
+                predictions.update({f"set_{str(i)}": pred_k})
+        return predictions
+
 
 def gcn_forward(reactants, directcorefinder:DirectCoreFinder, directcandranker:DirectCandRanker):
     """  
