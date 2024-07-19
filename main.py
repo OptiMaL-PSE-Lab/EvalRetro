@@ -10,16 +10,16 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 from src.alg_classes import LineSeparated, IndexSeparated
 from src.evaluation_metrics import eval_scscore, round_trip, diversity, duplicates, valsmiles, top_k
-from src.utils.fwd_mdls import gcn_forward 
+from src.utils.fwd_mdls import gcn_forward, localt_forward
 from src.utils.utilities import str2bool
 
 parser = argparse.ArgumentParser(description='Evaluate retrosynthesis algorithms')
 parser.add_argument('--k_back', type=int, help='Number of predictions made per target for retrosynthesis', default=10)
 parser.add_argument('--k_forward', type=int, help='Number of predictions made per reactant set for forward synthesis', default=2)
-parser.add_argument('--fwd_model', type=str, help='Name of forward model to use', default='gcn')
+parser.add_argument('--fwd_model', type=str, help='Name of forward model to use. Choose from ["gcn" and "lct"]',default='gcn')
 parser.add_argument('--invsmiles', type=int, help='Number of predictions check for invalid smiles per target', default=20)
 parser.add_argument('--dup', type=int, help='Number of predictions check for duplicates', default=20)
-parser.add_argument('--stereo', type=str2bool, help='Whether to remove stereochemistry for fwd model', default=True)
+parser.add_argument('--stereo', type=str2bool, help='Whether to remove stereochemistry for fwd model: [True for gcn, False for lct]', default=True)
 parser.add_argument('--check', type=str2bool, help='Remove invalid smiles from files', default=True)
 parser.add_argument('--config_name', type=str, help='Name of config file to use', required=True)
 parser.add_argument('--quick_eval', type=str2bool, help='Whether to evaluate results on the fly', default=True)
@@ -33,7 +33,7 @@ with open(os.path.join(cwd, args.config_path, args.config_name), 'r') as f:
     config = json.load(f)
 
 # Create dict for fwd models
-fwd_models = {"gcn": gcn_forward}
+fwd_models = {"gcn": gcn_forward, "lct": localt_forward}
 args.fwd_model = fwd_models[args.fwd_model]
 
 logging.basicConfig(filename='logs/main.log',level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

@@ -79,7 +79,7 @@ class DirectCandRanker():
             saver = tf.compat.v1.train.Saver()
             saver.restore(self.session, model_path)
     
-    def predict(self, react, top_cand_bonds, top_cand_scores=[], scores=True, top_n=100):
+    def predict(self, react, top_cand_bonds, top_cand_scores=[], scores=True):
         '''react: atom mapped reactant smiles
         top_cand_bonds: list of strings "ai-aj-bo"'''
 
@@ -132,7 +132,7 @@ class DirectCandRanker():
 
         outcomes = []
         if scores:
-            for i in range(min(len(cand_smiles), top_n)):
+            for i in range(min(len(cand_smiles), self.TOPK)):
                 outcomes.append({
                     'rank': i + 1,
                     'smiles': cand_smiles[i],
@@ -140,7 +140,7 @@ class DirectCandRanker():
                     'prob': cand_probs[i],
                 })
         else:
-            for i in range(min(len(cand_smiles), top_n)):
+            for i in range(min(len(cand_smiles), self.TOPK)):
                 outcomes.append({
                     'rank': i + 1,
                     'smiles': cand_smiles[i],
@@ -155,7 +155,7 @@ if __name__ == '__main__':
 
     from src.rexgen_direct.core_wln_global.directcorefinder import DirectCoreFinder 
 
-    directcorefinder = DirectCoreFinder()
+    directcorefinder = DirectCoreFinder(TOPK=5)
     directcorefinder.load_model()
     if len(sys.argv) < 2:
         print('Using example reaction')
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
     (react, bond_preds, bond_scores, cur_att_score) = directcorefinder.predict(react)
 
-    directcandranker = DirectCandRanker()
+    directcandranker = DirectCandRanker(TOPK=2)
     directcandranker.load_model()
     #outcomes = directcandranker.predict(react, bond_preds, bond_scores)
     outcomes = directcandranker.predict(react, bond_preds, bond_scores)

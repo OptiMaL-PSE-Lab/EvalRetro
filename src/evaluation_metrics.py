@@ -80,7 +80,7 @@ def round_trip(alg, args):
     round_trip.k = args.k_back
     rt_scores = defaultdict(dict)
     cleaned_data = alg.check_smi
-    model_init = init_fwd(k_pred_forw)
+    model_init = init_fwd(k_pred_forw, fwd_model.__name__)
 
     for k, (smiles_tar, reactants) in enumerate(alg.get_data("rt")):
         
