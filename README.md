@@ -7,9 +7,10 @@
 # EvalRetro
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A repository for evaluating single-step retrosynthesis algorithms.
-
+A repository for evaluating single-step retrosynthesis algorithms - [Digital Discovery](https://doi.org/10.1039/D4DD00007B).
+ 
 This code was tested for Linux (Ubuntu), Windows and Mac OS.
 
 ## Environment
@@ -47,7 +48,7 @@ To test your own retrosynthetic prediction on a test dataset (e.g. [USPTO-50k](h
     Within the script, the following arguments can be adjusted: 
     - **k_back**: Evaluation includes _k_ retrosynthesis predictions per target
     - **k_forward**: Forward model includes _k_ target predictions per reactant set.
-    - **fwd_model**: Type of forward reaction prediction model. So far, only _gcn_ is included.
+    - **fwd_model**: Type of forward reaction prediction model. Choose from [_gcn_, _lct_]
     - **config_name**: Name of the config file to be used
     - **quick_eval**: Boolean - prints the results (averages) for evaluation metrics directly to the terminal.
     - **data_path**: The path to the folder that contains your file, default = ./data
@@ -94,6 +95,35 @@ The structure is in .json format and should contain:
 3. Run `python plotting.py` to generate figures and tables
 </details>
 
+# Benchmarking Results
+<details>
+    <summary>📊 Results on USPTO-50k dataset</summary>
+
+<br>
+
+| Algorithms      | Rt-Accuracy (Top-10)* | Diversity | Validity | Duplicity | SCScore |
+|-----------------|:---------------------:|:---------:|:--------:|:---------:|:-------:|
+| _Semi-template_  |                       |           |          |           |         |
+| MEGAN           |      0.78 \| 0.80     |    0.30   |   0.90   |    0.90   |   0.36  |
+| GraphRetro      |      0.77 \| 0.80     |    0.19   |   0.84   |    0.47   |   0.35  |
+| RetroXpert      |      0.46 \| 0.48     |    0.27   |    0.81  |    0.91   |   0.42  |
+| G²Retro      |      0.69 \| 0.73     |    0.31   |     -    |    0.98   |   0.32  |
+|  _Template-free_  |                       |           |          |           |         |
+| Chemformer      |      0.86 \| 0.88     |    0.12   |   0.99   |    0.12   |   0.47  |
+| Graph2Smiles    |      0.43 \| 0.45     |    0.23   |   0.64   |    0.90   |   0.46  |
+| Retroformer     |      0.68 \| 0.71     |    0.24   |   0.92   |    0.83   |   0.43  |
+| GTA             |      0.72 \| 0.75     |    0.24   |   0.94   |    0.76   |   0.47  |
+| TiedTransformer |      0.69 \| 0.72     |    0.29   |   0.94   |    0.93   |   0.39  |
+|  _Template-based_ |                       |           |          |           |         |
+| GLN             |      0.84 \| 0.87     |    0.23   |    1.0   |    0.64   |   0.41  |
+| LocalRetro      |      0.81 \| 0.85     |    0.30   |    1.0   |    0.95   |   0.40  |
+| MHNReact        |          0.78         |    0.32   |    1.0   |    1.0    |   0.30  |
+
+*As evaluted by _gcn_ (WLDN-5) | _lct_ (LocalTransform) forward models, respectively.
+
+</details>
+
+
 # Interpretability Study
 <details>
   <summary>🚀 Click here to find out more details about interpretability of ML-based retrosynthesis models.</summary>
@@ -135,3 +165,11 @@ python inference.py
 ![Example of interpretability case study](/examples/example_interpret.png)
 
 </details>
+
+# Acknowledgements
+⭐ This repository is built on several open-source packages. We would like to thank the authors and acknowledge the following: 
+
+- [RDKit](https://github.com/rdkit/rdkit): For reading SMILES strings and checking validity of molecules
+- [SCScore](https://github.com/connorcoley/scscore): For calculating the SCScore metric.
+- [rxnfp](https://github.com/rxn4chemistry/rxnfp): For calculating the Diversity metric.
+- [WLDN-5](https://github.com/connorcoley/rexgen_direct) and [LocalTransform](https://github.com/kaist-amsg/LocalTransform): The reaction forward models used for calculating the rt-accuracy metric.
