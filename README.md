@@ -95,7 +95,7 @@ The structure is in .json format and should contain:
 3. Run `python plotting.py` to generate figures and tables
 </details>
 
-# Benchmarking Results
+## Benchmarking Results
 <details>
     <summary>📊 Results on USPTO-50k dataset</summary>
 
@@ -172,4 +172,4 @@ python inference.py
 - [RDKit](https://github.com/rdkit/rdkit): For reading SMILES strings and checking validity of molecules
 - [SCScore](https://github.com/connorcoley/scscore): For calculating the SCScore metric.
 - [rxnfp](https://github.com/rxn4chemistry/rxnfp): For calculating the Diversity metric.
-- [WLDN-5](https://github.com/connorcoley/rexgen_direct) and [LocalTransform](https://github.com/kaist-amsg/LocalTransform): The reaction forward models used for calculating the rt-accuracy metric.
+- [WLDN-5](https://github.com/connorcoley/rexgen_direct) and [LocalTransform](https://github.com/kaist-amsg/LocalTransform): The reaction forward models used for calculating the Rt-Accuracy metric.
